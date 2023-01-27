@@ -47,14 +47,14 @@ public class Elevator implements Runnable {
 	 * Stops the Elevator from moving.
 	 */
 	private void stopMoving() {
-		this.elevatorDirection = null;
+		this.elevatorDirection = Direction.STOPPED;
 	}
 	
 	/**
 	 * Moves the Elevator down one floor
 	 */
 	private void moveDown() {
-		this.elevatorDirection = Direction.Down;
+		this.elevatorDirection = Direction.DOWN;
 		this.currentFloor--;
 		System.out.println("Elevator moving down to floor " + this.currentFloor);			
 	}
