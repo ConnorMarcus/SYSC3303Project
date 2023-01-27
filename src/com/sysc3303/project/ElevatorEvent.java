@@ -12,7 +12,8 @@ import java.util.Date;
 public class ElevatorEvent {
 	public enum Direction {
 		UP,
-		Down;
+		DOWN,
+		STOPPED;
 	}
 	
 	private final Date time;
@@ -39,9 +40,9 @@ public class ElevatorEvent {
 	}
 	
 	private static boolean isEventValid(Date time, int floor, Direction direction, int carButton) {
-		return (time != null && floor > 0 && !(floor == 1 && direction==Direction.Down) 
+		return (time != null && floor > 0 && !(floor == 1 && direction==Direction.DOWN) 
 				&& floor <= Main.NUM_FLOORS && !(floor==Main.NUM_FLOORS && direction==Direction.UP)
-				&& carButton != floor && carButton > 0 && carButton <= Main.NUM_FLOORS);
+				&& carButton != floor && carButton > 0 && carButton <= Main.NUM_FLOORS && direction != Direction.STOPPED);
 	}
 	
 	/**
