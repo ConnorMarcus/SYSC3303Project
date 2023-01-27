@@ -11,7 +11,7 @@ import com.sysc3303.project.ElevatorEvent.Direction;
  */
 public class Elevator implements Runnable {
 	private final Scheduler scheduler;
-	private int numberOfFloors;
+//	private int numberOfFloors;
 	private int currentFloor;
 	private Direction elevatorDirection;
 	
@@ -21,9 +21,9 @@ public class Elevator implements Runnable {
 	 * @param scheduler The Elevator Scheduler.
 	 * @param numberOfFloors The number of floors of the Elevator.
 	 */
-	public Elevator(Scheduler scheduler, int numberOfFloors) {
+	public Elevator(Scheduler scheduler) {
 		this.scheduler = scheduler;
-		this.numberOfFloors = numberOfFloors;
+//		this.numberOfFloors = numberOfFloors;
 		this.currentFloor = 1;
 		elevatorDirection = null;
 	}
@@ -51,7 +51,7 @@ public class Elevator implements Runnable {
 	}
 	
 	/**
-	 * Moves the Elevator down one flor
+	 * Moves the Elevator down one floor
 	 */
 	private void moveDown() {
 		this.elevatorDirection = Direction.Down;
