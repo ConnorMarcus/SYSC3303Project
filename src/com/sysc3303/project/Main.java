@@ -3,8 +3,12 @@
  */
 package com.sysc3303.project;
 
+import java.text.ParseException;
+
+import com.sysc3303.project.ElevatorEvent.Direction;
+
 /**
- * @author
+ * @author Group 9
  *
  */
 public class Main {
@@ -13,9 +17,15 @@ public class Main {
 	
 	/**
 	 * @param args
+	 * @throws ParseException 
+	 * @throws IllegalArgumentException 
 	 */
-	public static void main(String[] args) {
-
+	public static void main(String[] args) throws IllegalArgumentException, ParseException {
+		Scheduler s = new Scheduler();
+		s.addEvent(new ElevatorEvent(Floor.createElevatorTime("12:14:25.100"), 3, Direction.UP, 5));
+		s.addEvent(new ElevatorEvent(Floor.createElevatorTime("12:14:28.100"), 3, Direction.UP, 4));
+		Thread t = new Thread(new Elevator(s), "T1");
+		t.start();
 	}
 
 }
