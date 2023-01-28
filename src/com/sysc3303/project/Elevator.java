@@ -42,13 +42,14 @@ public class Elevator implements Runnable {
 				Set<ElevatorEvent> events = scheduler.consumeEventFromStopped();
 				ElevatorEvent event = events.iterator().next();
 				int floorNumber = event.getFloorNumber();
-				closeDoors();
-				goToFloor(floorNumber);
+				
+				if (getCurrentFloor() != floorNumber) {
+					goToFloor(floorNumber);
+				}
+				
 				elevatorDirection = event.getDirection();
 				enterIntoElevator(events);
-				if(floorNumber != 1) {
-					closeDoors();
-				}
+				closeDoors();
 			}
 			else {
 				ElevatorAction action = scheduler.getElevatorAction(this);
@@ -78,6 +79,7 @@ public class Elevator implements Runnable {
 	 * @param floorNumber the floor number to go to.
 	 */
 	private void goToFloor(int floorNumber) {
+		closeDoors();
 		while (getCurrentFloor() < floorNumber) {
 			moveUp();
 			try {
@@ -96,9 +98,7 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 			}
 		}
-		if(floorNumber != 1) {
-			stopMoving();
-		}
+		stopMoving();
 	}
 	
 	/**
