@@ -19,7 +19,9 @@ import java.util.Set;
 public class Scheduler implements Runnable {
 	private final Queue<ElevatorEvent> eventQueue;
 	private final Map<Integer, Set<ElevatorEvent>> upFloorQueue;
-	private final Map<Integer, Set<ElevatorEvent>> downFloorQueue;
+	private final Map<Integer, Set<ElevatorEvent>> downFloorQueue; 
+	private int floorEntering;
+	private int floorExiting;
 	
 	/**
 	 * Initializes all event queues and sets
@@ -28,6 +30,8 @@ public class Scheduler implements Runnable {
 		eventQueue = new ArrayDeque<ElevatorEvent>();
 		upFloorQueue = new HashMap<>();
 		downFloorQueue = new HashMap<>();
+		floorEntering = -1; 
+		floorExiting = -1; 
 		
 		for (int i=1; i<=Main.NUM_FLOORS; i++) {
 			upFloorQueue.put(i, new HashSet<>());
@@ -37,10 +41,28 @@ public class Scheduler implements Runnable {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		/*
-		 * Tell elevator go up/down based on curEvents
-		 */
+		while (true) {
+			if (floorExiting > 0) {
+				/*
+				 * Call floor method (not implemented yet)
+				 * that sets the floor number, 
+				 * prints out people exiting, 
+				 * resets floorExiting by calling schedulers resetFloorExiting();  
+				 * 
+				 * EX: floorMethod(floorExiting)
+				 */
+			} 
+			if (floorEntering > 0) {
+				/*
+				 * Call floor method (not implemented yet)
+				 * that sets the floor number, 
+				 * prints out people entering, 
+				 * resets floorEntering by calling schedulers resetFloorEntering();  
+				 * 
+				 * EX: floorMethod(floorEntering)
+				 */
+			}
+		}
 		
 	}
 	
@@ -163,6 +185,38 @@ public class Scheduler implements Runnable {
 		else if (elevatorEvent.getDirection() == Direction.DOWN) {
 			downFloorQueue.get(elevatorEvent.getFloorNumber()).remove(elevatorEvent);
 		}
+	}
+	
+	/**
+	 * Setting what floor people are entering the elevator. 
+	 * 
+	 * @param floor	current floor of the elevator
+	 */
+	public synchronized void setFloorEntering(int floor) {
+		floorEntering = floor;
+	}
+	
+	/**
+	 * Setting what floor people are entering the elevator. 
+	 * 
+	 * @param floor	current floor of the elevator
+	 */
+	public synchronized void setFloorExiting(int floor) {
+		floorExiting= floor;
+	}
+	
+	/**
+	 * Resets floorEntering to signal that nobody is entering the elevator. 
+	 */
+	public synchronized void resetFloorEntering() {
+		floorEntering = -1; 
+	}
+	
+	/**
+	 * Resets floorExiting to signal that nobody is exiting the elevator. 
+	 */
+	public synchronized void resetFloorExiting() {
+		floorExiting = -1; 
 	}
 
 }
