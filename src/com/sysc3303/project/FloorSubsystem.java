@@ -21,6 +21,10 @@ public class FloorSubsystem implements Runnable {
 
     private ArrayDeque<ElevatorEvent> eventQueue;
 
+    /**
+     * A constructor for a FloorSubsystem
+     * @param scheduler The scheduler used to communicate with elevators
+     */
     public FloorSubsystem(Scheduler scheduler) {
         this.scheduler = scheduler;
         eventQueue = new ArrayDeque<>();
@@ -44,10 +48,17 @@ public class FloorSubsystem implements Runnable {
         return simpleDateFormat.parse(time);
     }
 
+    /**
+     * Read an event from the elevator via the scheduler
+     */
     private void readEvent() {
 
     }
 
+    /**
+     * Reads the input file for elevator timings
+     * Parses input into a queue of elevator events
+     */
     private void readFloorInputFile() {
         try {
             BufferedReader br = new BufferedReader(new FileReader(INPUT_PATH));
