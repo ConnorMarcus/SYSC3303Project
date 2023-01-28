@@ -1,43 +1,33 @@
-/**
- * 
- */
 package com.sysc3303.project;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
- * @author
+ * @author Patrick Vafaie
  *
  */
-public class Floor implements Runnable {
-	private final Scheduler scheduler;
-	
-	public Floor(Scheduler scheduler) {
-		this.scheduler = scheduler;
-	}
-	
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	/**
-	 * Helper method to create a Date object from a time string (called when reading event from text file)
-	 * 
-	 * @param time A time string in the following format hh:mm:ss.mmm
-	 * @return A Date object corresponding to the time string 
-	 * @throws ParseException An exception is thrown if the time string is not in the correct format
+public class Floor {
+
+	private static final int NUM_FLOORS = 5;
+
+	private FloorSubsystem controller;
+	private int floorNumber;
+
+	/*
+	TODO:
+	 - Up and down floor buttons
+	 - Floor lamps
+	 - Direction lamps
+	 - Arrival sensors
 	 */
-	public static Date createElevatorTime(String time) throws ParseException {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss.mmm");
-		return simpleDateFormat.parse(time);
+
+	/**
+	 * Constructor for a Floor object
+	 * @param controller The FloorSubsystem responsible for the floor
+	 * @param floorNumber Which floor number this is
+	 */
+	public Floor (FloorSubsystem controller, int floorNumber) {
+		this.controller = controller;
+		this.floorNumber = floorNumber;
 	}
-	
-	private void readEvent() {
-		
-	}
+
 
 }
