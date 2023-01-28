@@ -6,7 +6,7 @@ package com.sysc3303.project;
 import java.util.Date;
 
 /**
- * @author Connor Marcus
+ * @author Group 9
  *
  */
 public class ElevatorEvent {
@@ -42,7 +42,8 @@ public class ElevatorEvent {
 	private static boolean isEventValid(Date time, int floor, Direction direction, int carButton) {
 		return (time != null && floor > 0 && !(floor == 1 && direction==Direction.DOWN) 
 				&& floor <= Main.NUM_FLOORS && !(floor==Main.NUM_FLOORS && direction==Direction.UP)
-				&& carButton != floor && carButton > 0 && carButton <= Main.NUM_FLOORS && direction != Direction.STOPPED);
+				&& carButton != floor && carButton > 0 && carButton <= Main.NUM_FLOORS && direction != Direction.STOPPED
+				&& !(direction==Direction.UP && floor > carButton) && !(direction==Direction.DOWN && floor < carButton));
 	}
 	
 	/**
