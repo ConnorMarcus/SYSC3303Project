@@ -224,6 +224,9 @@ public class Elevator implements Runnable {
 	 */
 	private void enterIntoElevator(Set<ElevatorEvent> events) {
 		curEvents.addAll(events);
+		for (ElevatorEvent e: events) {
+			elevatorButtonAction(e.getCarButton(), true);
+		}
 		scheduler.setFloorEntering(getCurrentFloor());
 	}
 	
@@ -235,6 +238,7 @@ public class Elevator implements Runnable {
 		for (ElevatorEvent event : new HashSet<>(curEvents)) {
 			if (event.getCarButton() == getCurrentFloor()) {
 				curEvents.remove(event);
+				elevatorButtonAction(event.getCarButton(), false);
 			}
 		}
 		scheduler.setFloorExiting(getCurrentFloor());
@@ -246,6 +250,22 @@ public class Elevator implements Runnable {
 	 */
 	private void closeDoors() {
 		System.out.println("Elevator doors closing...");
+		
+	}
+	
+	/**
+	 * Handles outputting a message for the Elevators button.
+	 * @param floor the floor the elevator is travling to.
+	 * @param isClick indicates if it was a button click action.
+	 */
+	private void elevatorButtonAction(int floor, boolean isClick) {
+		String message = "Elevator button " + floor;
+		if (isClick) {
+			System.out.println(message + " has been pressed");
+		}
+		else {
+			System.out.println(message + "'s lamp has been turned off");
+		}
 		
 	}
 	
