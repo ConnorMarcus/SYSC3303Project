@@ -3,8 +3,8 @@
  */
 package com.sysc3303.project;
 
-import java.util.HashSet;
 import java.util.Set;
+
 import com.sysc3303.project.ElevatorEvent.Direction;
 
 /**
@@ -12,13 +12,11 @@ import com.sysc3303.project.ElevatorEvent.Direction;
  * @author Group 9
  */
 public class Elevator implements Runnable {
+	private final long elevatorID; //a unique elevator ID
 	private final Scheduler scheduler;
 	private int currentFloor;
 	private Direction elevatorDirection;
-	private final Set<ElevatorEvent> curEvents;
 	
-	//TODO only increment currentFloor and change elevatorDirection in a synchronized method since they
-	// are also accessed by Scheduler? Note: actually may not need synchronized for this class
 	
 	/**
 	 * Constructor for Elevator object.
@@ -29,7 +27,7 @@ public class Elevator implements Runnable {
 		this.scheduler = scheduler;
 		this.currentFloor = 1;
 		elevatorDirection = Direction.STOPPED;
-		curEvents = new HashSet<>();
+		elevatorID = ElevatorIDGenerator.getUniqueID();
 	}
 	
 	/**
@@ -38,8 +36,8 @@ public class Elevator implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			if (curEvents.isEmpty()) {
-				Set<ElevatorEvent> events = scheduler.consumeEventFromStopped();
+			if (getDirection() == Direction.STOPPED) {
+				Set<ElevatorEvent> events = scheduler.consumeEventFromStopped(elevatorID);
 				ElevatorEvent event = events.iterator().next();
 				int floorNumber = event.getFloorNumber();
 				
@@ -48,11 +46,11 @@ public class Elevator implements Runnable {
 				}
 				
 				elevatorDirection = event.getDirection();
-				enterIntoElevator(events);
+				enterIntoElevator();
 				closeDoors();
 			}
 			else {
-				ElevatorAction action = scheduler.getElevatorAction(this);
+				ElevatorAction action = scheduler.getElevatorAction(elevatorID, getCurrentFloor(), getDirection());
 				respondToElevatorAction(action);
 			}
 			
@@ -144,37 +142,12 @@ public class Elevator implements Runnable {
 	
 	
 	/**
-	 * Checks if people are exiting the Elevator.
-	 * @return True if people are exiting the Elevator.
-	 */
-	public synchronized boolean arePeopleExiting() {
-		for (ElevatorEvent event : curEvents) {
-			if (event.getCarButton() == getCurrentFloor()) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * Removes Elevator Event from Elevators current events.
-	 * @param event the event to remove.
-	 */
-	public synchronized void removeEvent(ElevatorEvent event) {
-		if (!curEvents.contains(event)) {
-			throw new IllegalArgumentException("Cannot remove elevator event, it is not part of the elevator's current events!");
-		}
-		curEvents.remove(event);
-	}
-	
-	/**
 	 * Moves the Elevator up one floor.
 	 */
 	private void moveUp() {
 		setDirection(Direction.UP);
 		incrementCurrentFloor();
-		System.out.println("Elevator moving up to floor " + getCurrentFloor());	
+		System.out.println(Thread.currentThread().getName() + ": Elevator moving up to floor " + getCurrentFloor());	
 	}
 
 	/**
@@ -182,8 +155,8 @@ public class Elevator implements Runnable {
 	 */
 	private void stopMoving() {
 		setDirection(Direction.STOPPED);
-		System.out.println("Elevator is stopping at floor " + getCurrentFloor());
-		System.out.println("Elevator doors opening...");
+		System.out.println(Thread.currentThread().getName() + ": Elevator is stopping at floor " + getCurrentFloor());
+		System.out.println(Thread.currentThread().getName() + ": Elevator doors opening...");
 	}
 	
 	/**
@@ -192,7 +165,7 @@ public class Elevator implements Runnable {
 	private void moveDown() {
 		setDirection(Direction.DOWN);
 		decrementCurrentFloor();
-		System.out.println("Elevator moving down to floor " + getCurrentFloor());			
+		System.out.println(Thread.currentThread().getName() + ": Elevator moving down to floor " + getCurrentFloor());			
 	}
 	
 	
@@ -202,28 +175,23 @@ public class Elevator implements Runnable {
 	 */
 	private void respondToElevatorAction(ElevatorAction action) {
 		if (action.shouldStop()) {
-			Direction prevDirection = elevatorDirection;
 			stopMoving();
 			if (action.arePeopleExit()) {
 				exitFromElevator();
 			}
 			if (action.arePeopleEnter()) {
-				enterIntoElevator(action.getPeopleEntering());
+				enterIntoElevator();
 			}
-			if (!curEvents.isEmpty()) {
-				elevatorDirection = prevDirection;
-				closeDoors();
-			}
+			elevatorDirection = action.getNextDirection();
+			if (elevatorDirection != Direction.STOPPED) closeDoors();
 		}
 	}
 	
 	
 	/**
 	 * Notifies Scheduler that people have entered the Elevator.
-	 * @param events the event which represents people entering the Elevator.
 	 */
-	private void enterIntoElevator(Set<ElevatorEvent> events) {
-		curEvents.addAll(events);
+	private void enterIntoElevator() {
 		scheduler.setFloorEntering(getCurrentFloor());
 	}
 	
@@ -232,11 +200,6 @@ public class Elevator implements Runnable {
 	 * Notifies Scheduler that people have exited the Elevator.
 	 */
 	private void exitFromElevator() {
-		for (ElevatorEvent event : new HashSet<>(curEvents)) {
-			if (event.getCarButton() == getCurrentFloor()) {
-				curEvents.remove(event);
-			}
-		}
 		scheduler.setFloorExiting(getCurrentFloor());
 	}
 	
@@ -245,7 +208,7 @@ public class Elevator implements Runnable {
 	 * Closes the Elevators doors.
 	 */
 	private void closeDoors() {
-		System.out.println("Elevator doors closing...");
+		System.out.println(Thread.currentThread().getName() + ": Elevator doors closing...");
 		
 	}
 	

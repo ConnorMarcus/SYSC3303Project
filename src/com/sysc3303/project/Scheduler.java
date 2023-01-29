@@ -20,6 +20,7 @@ public class Scheduler implements Runnable {
 	private final Queue<ElevatorEvent> eventQueue;
 	private final Map<Integer, Set<ElevatorEvent>> upFloorQueue;
 	private final Map<Integer, Set<ElevatorEvent>> downFloorQueue; 
+	private final Map<Long, Set<ElevatorEvent>> curEvents; //Maps Elevator ID to current events to be done by that elevator
 	private int floorEntering;
 	private int floorExiting;
 	
@@ -30,6 +31,7 @@ public class Scheduler implements Runnable {
 		eventQueue = new ArrayDeque<ElevatorEvent>();
 		upFloorQueue = new HashMap<>();
 		downFloorQueue = new HashMap<>();
+		curEvents = new HashMap<>();
 		floorEntering = -1; 
 		floorExiting = -1; 
 		
@@ -86,7 +88,7 @@ public class Scheduler implements Runnable {
 	/**
 	 * Starts the next elevator event from stopped state; called by the Elevator thread
 	 */
-	public synchronized Set<ElevatorEvent> consumeEventFromStopped() {
+	public synchronized Set<ElevatorEvent> consumeEventFromStopped(long elevatorID) {
 		while(eventQueue.isEmpty()) {
 			try {
 				wait();
@@ -96,39 +98,53 @@ public class Scheduler implements Runnable {
 				System.exit(1);
 			}
 		}
-		return getNextEventSet();
+		return getNextEventSet(elevatorID);
 	}
 
 	/**
-	 * Gets what the elevator should do given then current elevator object. 
-	 * 
-	 * @param elevator	currente elevator
-	 * @return ElevatorAction	the action the elevator should carry out
+	 * @param elevatorID the ID of the elevator
+	 * @param floor the current floor of the elevator
+	 * @param direction the current direction of the elevator
+	 * @return the action the elevator should carry out
 	 */
-	public synchronized ElevatorAction getElevatorAction(Elevator elevator) {
-		boolean peopleExit = false;
-		Set<ElevatorEvent> peopleEntering = new HashSet<>();
-		
-		if (elevator.arePeopleExiting()) {
-			peopleExit = true;
+	public synchronized ElevatorAction getElevatorAction(long elevatorID, int floor, Direction direction) {
+		if (curEvents.get(elevatorID) == null) {
+			curEvents.put(elevatorID, new HashSet<>());
 		}
-		if (elevator.getDirection() == Direction.UP) {
-			Set<ElevatorEvent> floorQueue = upFloorQueue.get(elevator.getCurrentFloor());
-			for (ElevatorEvent event : floorQueue) {
-				removeEvent(event);
-				peopleEntering.add(event);
+		boolean peopleAreExiting = updatePeopleExiting(elevatorID, floor);
+		boolean peopleAreEntering = updatePeopleEntering(elevatorID, floor, direction);
+		Direction nextDirection = curEvents.get(elevatorID).isEmpty() ? Direction.STOPPED : direction;
+		
+		return new ElevatorAction(peopleAreEntering, peopleAreExiting, nextDirection);
+	}
+	
+	
+	/**
+	 * @param elevatorID The elevator ID to update the current event set
+	 * @param floor The current floor of the elevator
+	 * @param direction The direction that the elevator is currently moving in
+	 * @return true if people are entering into the elevator, and false otherwise
+	 */
+	private boolean updatePeopleEntering(long elevatorID, int floor, Direction direction) {
+		Set<ElevatorEvent> peopleEntering = getEventsOnFloor(floor, direction);
+		curEvents.get(elevatorID).addAll(peopleEntering);
+		return !peopleEntering.isEmpty();
+	}
+	
+	/**
+	 * @param elevatorID The elevator ID to update the current event set
+	 * @param floor The current floor of the elevator
+	 * @return true if people are exiting into the elevator, and false otherwise
+	 */
+	private boolean updatePeopleExiting(long elevatorID, int floor) {
+		boolean peopleAreExiting = false;
+		for (ElevatorEvent event : new HashSet<>(curEvents.get(elevatorID))) {
+			if (event.getCarButton() == floor) {
+				curEvents.get(elevatorID).remove(event);
+				peopleAreExiting = true;
 			}
 		}
-		else if (elevator.getDirection() == Direction.DOWN) {
-			Set<ElevatorEvent> floorQueue = downFloorQueue.get(elevator.getCurrentFloor());
-			for (ElevatorEvent event : floorQueue) {
-				removeEvent(event);
-				peopleEntering.add(event);
-			}
-		}
-		
-		boolean peopleEnter = !peopleEntering.isEmpty();
-		return new ElevatorAction(peopleEnter || peopleExit, peopleEnter, peopleExit, peopleEntering);
+		return peopleAreExiting;
 	}
 	
 	
@@ -136,40 +152,49 @@ public class Scheduler implements Runnable {
 	 * Removes the next event from the event and floor queues, 
 	 * and adds it to the set of current events. Also removes and adds any events on
 	 * the same floor and going in the same direction.
+	 * 
+	 * @param elevatorID The ID of the elevator getting the event
+	 * @return The set of events added to the elevator's current event set
 	 */
-	private Set<ElevatorEvent> getNextEventSet() {
-		ElevatorEvent nextEvent = eventQueue.remove();
+	private Set<ElevatorEvent> getNextEventSet(long elevatorID) {
+		ElevatorEvent nextEvent = eventQueue.peek();
 		int floorNumber = nextEvent.getFloorNumber();
 		Direction dir = nextEvent.getDirection();
 		removeEvent(nextEvent);
 		Set<ElevatorEvent> otherEvents = getEventsOnFloor(floorNumber, dir);
 		otherEvents.add(nextEvent);
 		
+		if (curEvents.get(elevatorID) == null) {
+			curEvents.put(elevatorID, new HashSet<>());
+		}
+		curEvents.get(elevatorID).addAll(otherEvents);
+		
 		return otherEvents;
 	}
 	
 	/**
-	 * Gets the current people on the floor the elevator is at. 
+	 * Gets the ElevatorEvents corresponding to the current people on the floor the elevator is at. 
 	 * 
-	 * @param int	current floor of the elevator
-	 * @paraam Direction	direction of the elevator
+	 * @param int current floor of the elevator
+	 * @paraam Direction direction of the elevator
 	 */
 	private Set<ElevatorEvent> getEventsOnFloor(int floor, Direction dir) {
-		Set<ElevatorEvent> newEvents = new HashSet<>();
+		Set<ElevatorEvent> events = new HashSet<>();
+		Set<ElevatorEvent> floorQueue = null;
 		
 		if (dir == Direction.UP) { 
-			for (ElevatorEvent event : new HashSet<>(upFloorQueue.get(floor))) {
-				newEvents.add(event);
-				removeEvent(event);
-			}
+			floorQueue = upFloorQueue.get(floor);
 		}
 		else if (dir == Direction.DOWN) {
-			for (ElevatorEvent event : new HashSet<>(downFloorQueue.get(floor))) {
-				newEvents.add(event);
-				removeEvent(event);
-			}
+			floorQueue = downFloorQueue.get(floor);
 		}
-		return newEvents;
+		
+		for (ElevatorEvent event : new HashSet<>(floorQueue)) {
+			events.add(event);
+			removeEvent(event);
+		}
+		
+		return events;
 	}
 	
 	/**
