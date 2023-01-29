@@ -1,5 +1,6 @@
 package com.sysc3303.project;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.sysc3303.project.ElevatorEvent.Direction;
@@ -13,6 +14,7 @@ public class ElevatorAction {
 	private boolean peopleAreEntering;
 	private boolean peopleAreExiting;
 	private Direction nextDirection;
+	private Set<Integer> carButtonFloors;
 	
 	/**
 	 * Constructor for ElevatorAction.
@@ -20,10 +22,11 @@ public class ElevatorAction {
 	 * @param peopleExit the peopleExit flag.
 	 * @param nextDirection the next direction that the elevator should move
 	 */
-	public ElevatorAction (boolean peopleEnter, boolean peopleExit, Direction nextDirection) {
+	public ElevatorAction (boolean peopleEnter, boolean peopleExit, Direction nextDirection, Set<Integer> carButtonFloors) {
 		this.peopleAreEntering = peopleEnter;
 		this.peopleAreExiting = peopleExit;
 		this.nextDirection = nextDirection;
+		this.carButtonFloors = carButtonFloors;
 	}
 	
 	
@@ -52,10 +55,19 @@ public class ElevatorAction {
 	}
 	
 	/**
-	 * @return The next direction of the elevator
+	 * Gets the next direction of the Elevator
+	 * @return The next direction.
 	 */
 	public Direction getNextDirection() {
 		return nextDirection;
+	}
+	
+	/**
+	 * Get's the car button floor selected.
+	 * @return the car button floor.
+	 */
+	public Set<Integer> getCarButtonFloors() {
+		return carButtonFloors;
 	}
 	
 }
