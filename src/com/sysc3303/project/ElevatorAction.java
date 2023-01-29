@@ -2,41 +2,37 @@ package com.sysc3303.project;
 
 import java.util.Set;
 
+import com.sysc3303.project.ElevatorEvent.Direction;
+
 /**
  * The ElevatorAction Object.
  * @author Group 9
  *
  */
 public class ElevatorAction {
-	private boolean shouldStop;
-	private boolean peopleEnter;
-	private boolean peopleExit;
-	private Set<ElevatorEvent> peopleEntering;
+	private boolean peopleAreEntering;
+	private boolean peopleAreExiting;
+	private Direction nextDirection;
 	
 	/**
 	 * Constructor for ElevatorAction.
-	 * @param shouldStop the should stop flag.
 	 * @param peopleEnter the peopleEnter flag.
 	 * @param peopleExit the peopleExit flag.
-	 * @param peopleEntering the set of ElevatorEvents for the entering people.
+	 * @param nextDirection the next direction that the elevator should move
 	 */
-	public ElevatorAction (boolean shouldStop, boolean peopleEnter, boolean peopleExit, Set<ElevatorEvent> peopleEntering) {
-		if (!shouldStop && (peopleEnter || peopleExit)) {
-			throw new IllegalArgumentException("Invalid argument; cannot exit/leave elevator while it is still moving!");
-		}
-		this.shouldStop = shouldStop;
-		this.peopleEnter = peopleEnter;
-		this.peopleExit = peopleExit;
-		this.peopleEntering = peopleEntering;
+	public ElevatorAction (boolean peopleEnter, boolean peopleExit, Direction nextDirection) {
+		this.peopleAreEntering = peopleEnter;
+		this.peopleAreExiting = peopleExit;
+		this.nextDirection = nextDirection;
 	}
 	
 	
 	/**
-	 * Gets the shouldStop flag.
-	 * @return True if Elevator should stop.
+	 * Gets whether the elevator should stop.
+	 * @return true if the Elevator should stop and false otherwise.
 	 */
 	public boolean shouldStop() {
-		return shouldStop;
+		return peopleAreEntering || peopleAreExiting;
 	}
 	
 	/**
@@ -44,22 +40,22 @@ public class ElevatorAction {
 	 * @return True if people are entering the Elevator.
 	 */
 	public boolean arePeopleEnter() {
-		return this.peopleEnter;
+		return this.peopleAreEntering;
 	}
 	
 	/**
 	 * Gets the arePeopleExit flag.
-	 * @return True if peoplr are entering the Elevator.
+	 * @return True if people are entering the Elevator.
 	 */
 	public boolean arePeopleExit() {
-		return peopleExit;
+		return peopleAreExiting;
 	}
 	
 	/**
-	 * Gets the set of ElevatorEvents for the entering people.
-	 * @return set of ElevatorEvents of entering people.
+	 * @return The next direction of the elevator
 	 */
-	public Set<ElevatorEvent> getPeopleEntering() {
-		return peopleEntering;
+	public Direction getNextDirection() {
+		return nextDirection;
 	}
+	
 }
