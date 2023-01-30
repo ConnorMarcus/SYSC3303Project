@@ -1,43 +1,81 @@
-/**
- * 
- */
 package com.sysc3303.project;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
- * @author
+ * @author Patrick Vafaie
  *
  */
-public class Floor implements Runnable {
-	private final Scheduler scheduler;
-	
-	public Floor(Scheduler scheduler) {
-		this.scheduler = scheduler;
-	}
-	
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	/**
-	 * Helper method to create a Date object from a time string (called when reading event from text file)
-	 * 
-	 * @param time A time string in the following format hh:mm:ss.mmm
-	 * @return A Date object corresponding to the time string 
-	 * @throws ParseException An exception is thrown if the time string is not in the correct format
+public class Floor {
+
+	private static final int NUM_FLOORS = 5;
+	private static final int NUM_CARS = 1;
+
+	private FloorSubsystem controller;
+	private int floorNumber;
+	// The buttons to go up or down on a given floor
+	private HashMap<ElevatorEvent.Direction, FloorButton> floorButtons;
+	// Lamps that light up when a floor button is pressed and turn off when an elevator going in that direction arrives
+	private HashMap<ElevatorEvent.Direction, FloorLamp> floorLamps;
+	// Lamps that light up temporarily to indicate which direction an elevator is going when it arrives, until it leaves
+	private ArrayList<DirectionLamp[]> directionLamps;
+	// Each elevator shaft at each floor has a sensor to detect the presence of an elevator
+	// private ArrayList<ArrivalSensor> arrivalSensors;
+
+	/*
+	TODO:
+	 - Arrival sensors
 	 */
-	public static Date createElevatorTime(String time) throws ParseException {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss.mmm");
-		return simpleDateFormat.parse(time);
-	}
-	
-	private void readEvent() {
-		
+
+	/**
+	 * Constructor for a Floor object
+	 * @param controller The FloorSubsystem responsible for the floor
+	 * @param floorNumber Which floor number this is
+	 */
+	public Floor (FloorSubsystem controller, int floorNumber) {
+		this.controller = controller;
+		this.floorNumber = floorNumber;
+
+		floorButtons = new HashMap<>();
+		floorLamps = new HashMap<>();
+		directionLamps = new ArrayList<>();
+
+		// Top floor won't have an up button
+		if (floorNumber < NUM_FLOORS) {
+			floorButtons.put(ElevatorEvent.Direction.UP, new FloorButton(ElevatorEvent.Direction.UP));
+			floorLamps.put(ElevatorEvent.Direction.UP, new FloorLamp(ElevatorEvent.Direction.UP));
+		}
+		// Bottom floor won't have a down button
+		if (floorNumber > 1) {
+			floorButtons.put(ElevatorEvent.Direction.DOWN, new FloorButton(ElevatorEvent.Direction.DOWN));
+			floorLamps.put(ElevatorEvent.Direction.DOWN, new FloorLamp(ElevatorEvent.Direction.DOWN));
+		}
+
+		// Direction lamps and arrival sensors are for every elevator
+		for (int i = 0; i < NUM_CARS; ++i) {
+			DirectionLamp[] elevatorCarDirectionLamps = {
+					new DirectionLamp(ElevatorEvent.Direction.UP),
+					new DirectionLamp(ElevatorEvent.Direction.DOWN)};
+			directionLamps.add(elevatorCarDirectionLamps);
+		}
 	}
 
+	public int getFloorNumber() {
+		return floorNumber;
+	}
+
+	/**
+	 * Presses the button to request an elevator in a given direction
+	 * @param requestedDirection Which button to press
+	 * @throws IllegalArgumentException if trying to go above top floor/below bottom floor
+	 */
+	public void pressButton(ElevatorEvent.Direction requestedDirection) throws IllegalArgumentException {
+		if (floorButtons.get(requestedDirection) == null) {
+			throw new IllegalArgumentException();
+		}
+		floorButtons.get(requestedDirection).setPressed(true);
+		floorLamps.get(requestedDirection).turnOn();
+		// TODO: make some call?
+	}
 }

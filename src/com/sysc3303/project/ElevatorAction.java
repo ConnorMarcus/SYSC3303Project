@@ -48,7 +48,7 @@ public class ElevatorAction {
 	
 	/**
 	 * Gets the arePeopleExit flag.
-	 * @return True if people are entering the Elevator.
+	 * @return True if people are exiting the Elevator.
 	 */
 	public boolean arePeopleExit() {
 		return peopleAreExiting;
