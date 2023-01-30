@@ -37,8 +37,8 @@ public class Floor {
 		this.controller = controller;
 		this.floorNumber = floorNumber;
 
-		floorButtons = new ArrayList<>();
-		floorLamps = new ArrayList<>();
+		floorButtons = new HashMap<>();
+		floorLamps = new HashMap<>();
 		directionLamps = new ArrayList<>();
 
 		// Top floor won't have an up button
