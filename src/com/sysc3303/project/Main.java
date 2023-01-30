@@ -23,10 +23,16 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IllegalArgumentException, ParseException {
 		Scheduler s = new Scheduler();
-		s.addEvent(new ElevatorEvent(Floor.createElevatorTime("12:14:25.100"), 2, Direction.UP, 4));
-		s.addEvent(new ElevatorEvent(Floor.createElevatorTime("12:14:28.100"), 2, Direction.UP, 5));
-		Thread t = new Thread(new Elevator(s), "Elevator1");
-		t.start();
+		FloorSubsystem floor = new FloorSubsystem(s);
+		s.setFloor(floor);
+		//s.addEvent(new ElevatorEvent(FloorSubsystem.createElevatorTime("12:14:25.100"), 2, Direction.UP, 4));
+		//s.addEvent(new ElevatorEvent(FloorSubsystem.createElevatorTime("12:14:28.100"), 2, Direction.UP, 5));
+		Thread t1 = new Thread(new Elevator(s), "Elevator1");
+		Thread t2 = new Thread(floor, "Floor1");
+		Thread t3 = new Thread(s, "Scheduler");
+		t1.start();
+		t2.start();
+		t3.start();
 	}
 
 }

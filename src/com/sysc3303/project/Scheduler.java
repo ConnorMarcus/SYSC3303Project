@@ -23,7 +23,12 @@ public class Scheduler implements Runnable {
 	private final Map<Long, Set<ElevatorEvent>> curEvents; //Maps Elevator ID to current events to be done by that elevator
 	private int floorEntering;
 	private int floorExiting;
-	
+	private FloorSubsystem floor;
+
+	public void setFloor(FloorSubsystem floor) {
+		this.floor = floor;
+	}
+
 	/**
 	 * Initializes all event queues and sets
 	 */
@@ -33,7 +38,8 @@ public class Scheduler implements Runnable {
 		downFloorQueue = new HashMap<>();
 		curEvents = new HashMap<>();
 		floorEntering = -1; 
-		floorExiting = -1; 
+		floorExiting = -1;
+		this.floor = floor;
 		
 		for (int i=1; i<=Main.NUM_FLOORS; i++) {
 			upFloorQueue.put(i, new HashSet<>());
@@ -45,24 +51,10 @@ public class Scheduler implements Runnable {
 	public void run() {
 		while (true) {
 			if (floorExiting > 0) {
-				/*
-				 * Call floor method (not implemented yet)
-				 * that sets the floor number, 
-				 * prints out people exiting, 
-				 * resets floorExiting by calling schedulers resetFloorExiting();  
-				 * 
-				 * EX: floorMethod(floorExiting)
-				 */
+				floor.setFloorExiting(floorExiting);
 			} 
 			if (floorEntering > 0) {
-				/*
-				 * Call floor method (not implemented yet)
-				 * that sets the floor number, 
-				 * prints out people entering, 
-				 * resets floorEntering by calling schedulers resetFloorEntering();  
-				 * 
-				 * EX: floorMethod(floorEntering)
-				 */
+				floor.setFloorEntering(floorEntering);
 			}
 		}
 		
@@ -223,6 +215,13 @@ public class Scheduler implements Runnable {
 	 */
 	public synchronized void setFloorEntering(int floor) {
 		floorEntering = floor;
+		try {
+			wait();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 	
 	/**
@@ -232,20 +231,29 @@ public class Scheduler implements Runnable {
 	 */
 	public synchronized void setFloorExiting(int floor) {
 		floorExiting= floor;
+		try {
+			wait();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 	
 	/**
 	 * Resets floorEntering to signal that nobody is entering the elevator. 
 	 */
 	public synchronized void resetFloorEntering() {
-		floorEntering = -1; 
+		floorEntering = -1;
+		notifyAll();
 	}
 	
 	/**
 	 * Resets floorExiting to signal that nobody is exiting the elevator. 
 	 */
 	public synchronized void resetFloorExiting() {
-		floorExiting = -1; 
+		floorExiting = -1;
+		notifyAll();
 	}
 
 }

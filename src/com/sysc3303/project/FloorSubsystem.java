@@ -1,13 +1,12 @@
 package com.sysc3303.project;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.FileSystem;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author Patrick Vafaie
@@ -21,6 +20,11 @@ public class FloorSubsystem implements Runnable {
 
     private ArrayDeque<ElevatorEvent> eventQueue;
 
+    // The floors in the building by floor number
+    private HashMap<Integer, Floor> floors;
+    private int floorEntering = -1;
+    private int floorExiting = -1;
+
     /**
      * A constructor for a FloorSubsystem
      * @param scheduler The scheduler used to communicate with elevators
@@ -28,12 +32,32 @@ public class FloorSubsystem implements Runnable {
     public FloorSubsystem(Scheduler scheduler) {
         this.scheduler = scheduler;
         eventQueue = new ArrayDeque<>();
+        floors = new HashMap<>();
+        for (int i = 0; i < Floor.NUM_FLOORS; ++i) {
+            floors.put(i + 1, new Floor(i + 1));
+        }
     }
 
     @Override
     public void run() {
         readFloorInputFile();
+        // Send events to scheduler
+        for (ElevatorEvent e : eventQueue) {
+            scheduler.addEvent(e);
+        }
 
+        while(true) {
+            if (floorExiting > 0) {
+                System.out.println(Thread.currentThread().getName() + ": people are exiting on floor: " + floorExiting);
+                floorExiting = -1;
+                scheduler.resetFloorExiting();
+            }
+            if (floorEntering > 0) {
+                System.out.println(Thread.currentThread().getName() + ": people are entering on floor: " + floorEntering);
+                floorEntering = -1;
+                scheduler.resetFloorEntering();
+            }
+        }
     }
 
     /**
@@ -49,10 +73,12 @@ public class FloorSubsystem implements Runnable {
     }
 
     /**
-     * Read an event from the elevator via the scheduler
+     * Read an event from the elevator via the scheduler+
+     * @param floor which floor the elevator has arrived at
+     * @param elevatorId the ID of the elevator
      */
-    private void readEvent() {
-
+    public synchronized void respondToElevatorArrival(int floor, int elevatorId) {
+        floors.get(floor).handleElevatorArrival(elevatorId);
     }
 
     /**
@@ -86,4 +112,22 @@ public class FloorSubsystem implements Runnable {
         }
     }
 
+
+    /**
+     * Setting what floor people are entering the elevator.
+     *
+     * @param floor	current floor of the elevator
+     */
+    public synchronized void setFloorEntering(int floor) {
+        floorEntering = floor;
+    }
+
+    /**
+     * Setting what floor people are entering the elevator.
+     *
+     * @param floor	current floor of the elevator
+     */
+    public synchronized void setFloorExiting(int floor) {
+        floorExiting= floor;
+    }
 }

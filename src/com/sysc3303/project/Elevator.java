@@ -57,12 +57,12 @@ public class Elevator implements Runnable {
 			}
 			
 			
-			try {
-				Thread.sleep(1000);
-			} 
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(1000);
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 			
 			if (elevatorDirection == Direction.UP) {
 				moveUp();
@@ -82,21 +82,21 @@ public class Elevator implements Runnable {
 		closeDoors();
 		while (getCurrentFloor() < floorNumber) {
 			moveUp();
-			try {
-				Thread.sleep(1000);
-			} 
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(1000);
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 		while (getCurrentFloor() > floorNumber) {
 			moveDown();
-			try {
-				Thread.sleep(1000);
-			} 
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(1000);
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 		stopMoving();
 	}
