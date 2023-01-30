@@ -112,10 +112,10 @@ public class Scheduler implements Runnable {
 			curEvents.put(elevatorID, new HashSet<>());
 		}
 		boolean peopleAreExiting = updatePeopleExiting(elevatorID, floor);
-		boolean peopleAreEntering = updatePeopleEntering(elevatorID, floor, direction);
+		Set<Integer> peopleAreEntering = updatePeopleEntering(elevatorID, floor, direction);
 		Direction nextDirection = curEvents.get(elevatorID).isEmpty() ? Direction.STOPPED : direction;
 		
-		return new ElevatorAction(peopleAreEntering, peopleAreExiting, nextDirection);
+		return new ElevatorAction(!peopleAreEntering.isEmpty(), peopleAreExiting, nextDirection, peopleAreEntering);
 	}
 	
 	
@@ -125,10 +125,14 @@ public class Scheduler implements Runnable {
 	 * @param direction The direction that the elevator is currently moving in
 	 * @return true if people are entering into the elevator, and false otherwise
 	 */
-	private boolean updatePeopleEntering(long elevatorID, int floor, Direction direction) {
+	private Set<Integer> updatePeopleEntering(long elevatorID, int floor, Direction direction) {
 		Set<ElevatorEvent> peopleEntering = getEventsOnFloor(floor, direction);
 		curEvents.get(elevatorID).addAll(peopleEntering);
-		return !peopleEntering.isEmpty();
+		Set<Integer> carButtons = new HashSet<>();
+		for (ElevatorEvent elevatorEvent: peopleEntering) {
+			carButtons.add(elevatorEvent.getCarButton());
+		}
+		return carButtons;
 	}
 	
 	/**

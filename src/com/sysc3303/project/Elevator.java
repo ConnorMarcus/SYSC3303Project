@@ -3,6 +3,7 @@
  */
 package com.sysc3303.project;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.sysc3303.project.ElevatorEvent.Direction;
@@ -47,6 +48,7 @@ public class Elevator implements Runnable {
 				
 				elevatorDirection = event.getDirection();
 				enterIntoElevator();
+				getButtonPressFromEvents(events);
 				closeDoors();
 			}
 			else {
@@ -155,7 +157,8 @@ public class Elevator implements Runnable {
 	 */
 	private void stopMoving() {
 		setDirection(Direction.STOPPED);
-		System.out.println(Thread.currentThread().getName() + ": Elevator is stopping at floor " + getCurrentFloor());
+		int currentFloor = getCurrentFloor();
+		System.out.println(Thread.currentThread().getName() + ": Elevator is stopping at floor " + currentFloor);
 		System.out.println(Thread.currentThread().getName() + ": Elevator doors opening...");
 	}
 	
@@ -181,6 +184,7 @@ public class Elevator implements Runnable {
 			}
 			if (action.arePeopleEnter()) {
 				enterIntoElevator();
+				pressElevatorButton(action.getCarButtonFloors());	
 			}
 			elevatorDirection = action.getNextDirection();
 			if (elevatorDirection != Direction.STOPPED) closeDoors();
@@ -200,6 +204,7 @@ public class Elevator implements Runnable {
 	 * Notifies Scheduler that people have exited the Elevator.
 	 */
 	private void exitFromElevator() {
+		System.out.println(Thread.currentThread().getName() + ": Elevator floor button " + getCurrentFloor() + "'s lamp has been turned off");
 		scheduler.setFloorExiting(getCurrentFloor());
 	}
 	
@@ -210,6 +215,24 @@ public class Elevator implements Runnable {
 	private void closeDoors() {
 		System.out.println(Thread.currentThread().getName() + ": Elevator doors closing...");
 		
+	}
+	
+	private void getButtonPressFromEvents(Set<ElevatorEvent> events) {
+		Set<Integer> buttonFloors = new HashSet<>();
+		for (ElevatorEvent event: events) {
+			buttonFloors.add(event.getCarButton());
+		}
+		pressElevatorButton(buttonFloors);
+	}
+	
+	/**
+	 * Handles outputting a message for the Elevators button.
+	 * @param buttonFloors the integer set of floor numbers the elevator is traveling to.
+	 */
+	private void pressElevatorButton(Set<Integer> buttonFloors) {
+		for (int floor: buttonFloors) {
+			System.out.println(Thread.currentThread().getName() + ": Elevator floor button " + floor + " has been pressed");
+		}
 	}
 	
 	
