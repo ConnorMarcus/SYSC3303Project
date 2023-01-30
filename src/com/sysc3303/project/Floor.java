@@ -9,10 +9,9 @@ import java.util.HashMap;
  */
 public class Floor {
 
-	private static final int NUM_FLOORS = 5;
+	public static final int NUM_FLOORS = 5;
 	private static final int NUM_CARS = 1;
 
-	private FloorSubsystem controller;
 	private int floorNumber;
 	// The buttons to go up or down on a given floor
 	private HashMap<ElevatorEvent.Direction, FloorButton> floorButtons;
@@ -30,11 +29,9 @@ public class Floor {
 
 	/**
 	 * Constructor for a Floor object
-	 * @param controller The FloorSubsystem responsible for the floor
 	 * @param floorNumber Which floor number this is
 	 */
-	public Floor (FloorSubsystem controller, int floorNumber) {
-		this.controller = controller;
+	public Floor (int floorNumber) {
 		this.floorNumber = floorNumber;
 
 		floorButtons = new HashMap<>();
@@ -78,4 +75,12 @@ public class Floor {
 		floorLamps.get(requestedDirection).turnOn();
 		// TODO: make some call?
 	}
+
+	public void handleElevatorArrival(int elevatorId) {
+		System.out.println("Elevator with ID " + String.valueOf(elevatorId) + " arrived at floor " + String.valueOf(floorNumber));
+		/*
+		add some lamp/button handling
+		 */
+	}
+
 }
