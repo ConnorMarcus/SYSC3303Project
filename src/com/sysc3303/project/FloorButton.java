@@ -30,5 +30,7 @@ public class FloorButton {
      */
     public boolean getButtonStatus() { return pressed; }
 
+    public void pressButton() { pressed = !pressed; }
+
     public ElevatorEvent.Direction getDirection() { return direction; }
 }
