@@ -21,7 +21,7 @@ public class Floor {
 	// Lamps that light up temporarily to indicate which direction an elevator is going when it arrives, until it leaves
 	private ArrayList<DirectionLamp[]> directionLamps;
 	// Each elevator shaft at each floor has a sensor to detect the presence of an elevator
-	private ArrayList<ArrivalSensor> arrivalSensors;
+	// private ArrayList<ArrivalSensor> arrivalSensors;
 
 	/*
 	TODO:
