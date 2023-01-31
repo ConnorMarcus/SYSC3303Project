@@ -3,7 +3,6 @@
  */
 package com.sysc3303.project;
 
-import java.text.ParseException;
 
 /**
  * @author Group 9
@@ -14,7 +13,7 @@ public class Main {
 	/**
 	 * main method (entry point of program)
 	 */
-	public static void main(String[] args) throws IllegalArgumentException, ParseException {
+	public static void main(String[] args) {
 		Scheduler s = new Scheduler();
 		Floor f = new Floor(s);
 		Elevator e = new Elevator(s);
