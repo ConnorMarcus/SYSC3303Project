@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * @author Patrick Vafaie
+ * @author Group 9
  *
  */
 public class Floor {

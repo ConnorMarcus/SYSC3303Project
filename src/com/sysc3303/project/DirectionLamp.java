@@ -1,5 +1,9 @@
 package com.sysc3303.project;
 
+/**
+ * @author Group 9
+ *
+ */
 public class DirectionLamp extends Lamp {
 
     /**

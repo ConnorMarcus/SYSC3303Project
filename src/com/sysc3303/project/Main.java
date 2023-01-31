@@ -13,7 +13,6 @@ import com.sysc3303.project.ElevatorEvent.Direction;
  *
  */
 public class Main {
-	public static final int NUM_FLOORS = 5;
 	
 	
 	/**
@@ -24,15 +23,13 @@ public class Main {
 	public static void main(String[] args) throws IllegalArgumentException, ParseException {
 		Scheduler s = new Scheduler();
 		FloorSubsystem floor = new FloorSubsystem(s);
-		s.setFloor(floor);
-		//s.addEvent(new ElevatorEvent(FloorSubsystem.createElevatorTime("12:14:25.100"), 2, Direction.UP, 4));
-		//s.addEvent(new ElevatorEvent(FloorSubsystem.createElevatorTime("12:14:28.100"), 2, Direction.UP, 5));
-		Thread t1 = new Thread(new Elevator(s), "Elevator1");
-		Thread t2 = new Thread(floor, "Floor1");
-		Thread t3 = new Thread(s, "Scheduler");
+		Thread t1 = new Thread(new Elevator(s), "ElevatorThread");
+		Thread t2 = new Thread(floor, "FloorThread");
+		Thread t3 = new Thread(s, "SchedulerThread");
 		t1.start();
 		t2.start();
 		t3.start();
+		
 	}
 
 }

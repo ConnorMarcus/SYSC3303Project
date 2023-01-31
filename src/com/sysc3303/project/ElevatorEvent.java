@@ -35,14 +35,13 @@ public class ElevatorEvent {
 		this.time = time;
 		this.floorNumber = floor;
 		this.direction = direction;
-		this.carButtonNumber = carButton;
-			
+		this.carButtonNumber = carButton;			
 	}
 	
 	private static boolean isEventValid(Date time, int floor, Direction direction, int carButton) {
 		return (time != null && floor > 0 && !(floor == 1 && direction==Direction.DOWN) 
-				&& floor <= Main.NUM_FLOORS && !(floor==Main.NUM_FLOORS && direction==Direction.UP)
-				&& carButton != floor && carButton > 0 && carButton <= Main.NUM_FLOORS && direction != Direction.STOPPED
+				&& floor <= Floor.NUM_FLOORS && !(floor==Floor.NUM_FLOORS && direction==Direction.UP)
+				&& carButton != floor && carButton > 0 && carButton <= Floor.NUM_FLOORS && direction != Direction.STOPPED
 				&& !(direction==Direction.UP && floor > carButton) && !(direction==Direction.DOWN && floor < carButton));
 	}
 	
