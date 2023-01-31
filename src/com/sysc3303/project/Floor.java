@@ -95,17 +95,8 @@ public class Floor implements Runnable {
 						elevatorButton);
 				eventQueue.add(elevatorEvent);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		}
-
-		try {
 			br.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
