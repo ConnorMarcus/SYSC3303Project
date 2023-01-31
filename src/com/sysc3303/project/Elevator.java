@@ -5,6 +5,7 @@ package com.sysc3303.project;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.sysc3303.project.ElevatorEvent.Direction;
 
@@ -17,7 +18,15 @@ public class Elevator implements Runnable {
 	private final Scheduler scheduler;
 	private int currentFloor;
 	private Direction elevatorDirection;
+	private static final AtomicLong ID = new AtomicLong(0);
 	
+	
+	/**
+	 * @return a unique elevator ID
+	 */
+	private static long getUniqueID() {
+		return ID.getAndIncrement();
+	}
 	
 	/**
 	 * Constructor for Elevator object.
@@ -28,7 +37,7 @@ public class Elevator implements Runnable {
 		this.scheduler = scheduler;
 		this.currentFloor = 1;
 		elevatorDirection = Direction.STOPPED;
-		elevatorID = ElevatorIDGenerator.getUniqueID();
+		elevatorID = getUniqueID();
 	}
 	
 	/**
@@ -57,13 +66,6 @@ public class Elevator implements Runnable {
 			}
 			
 			
-//			try {
-//				Thread.sleep(1000);
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-			
 			if (elevatorDirection == Direction.UP) {
 				moveUp();
 			}
@@ -82,21 +84,9 @@ public class Elevator implements Runnable {
 		closeDoors();
 		while (getCurrentFloor() < floorNumber) {
 			moveUp();
-//			try {
-//				Thread.sleep(1000);
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
 		}
 		while (getCurrentFloor() > floorNumber) {
 			moveDown();
-//			try {
-//				Thread.sleep(1000);
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
 		}
 		stopMoving();
 	}
@@ -197,6 +187,15 @@ public class Elevator implements Runnable {
 	 */
 	private void enterIntoElevator() {
 		scheduler.setFloorEntering(getCurrentFloor());
+		
+		/*TODO: Implement actual synchronization with FloorSubsytem to wait
+		for people to exit to close doors */
+		try {
+			Thread.sleep(500);
+		} 
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -206,6 +205,15 @@ public class Elevator implements Runnable {
 	private void exitFromElevator() {
 		System.out.println(Thread.currentThread().getName() + ": Elevator floor button " + getCurrentFloor() + "'s lamp has been turned off");
 		scheduler.setFloorExiting(getCurrentFloor());
+		
+		/*TODO: Implement actual synchronization with FloorSubsytem to wait
+		for people to exit to close doors */
+		try {
+			Thread.sleep(500);
+		} 
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

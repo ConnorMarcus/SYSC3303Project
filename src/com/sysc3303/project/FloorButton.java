@@ -1,7 +1,7 @@
 package com.sysc3303.project;
 
 /**
- * @author Patrick Vafaie
+ * @author Group 9
  *
  */
 public class FloorButton {

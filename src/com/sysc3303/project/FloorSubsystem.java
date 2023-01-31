@@ -9,21 +9,17 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
- * @author Patrick Vafaie
+ * @author Group 9
  *
  */
 public class FloorSubsystem implements Runnable {
-
     private final String INPUT_PATH = "Resources/floor_input.txt";
-
     private final Scheduler scheduler;
-
     private ArrayDeque<ElevatorEvent> eventQueue;
-
-    // The floors in the building by floor number
-    private HashMap<Integer, Floor> floors;
+    private HashMap<Integer, Floor> floors; // The floors in the building by floor number
     private int floorEntering = -1;
     private int floorExiting = -1;
+    private static FloorSubsystem instance; //a static instance of this class
 
     /**
      * A constructor for a FloorSubsystem
@@ -33,10 +29,18 @@ public class FloorSubsystem implements Runnable {
         this.scheduler = scheduler;
         eventQueue = new ArrayDeque<>();
         floors = new HashMap<>();
+        instance = this;
         for (int i = 0; i < Floor.NUM_FLOORS; ++i) {
             floors.put(i + 1, new Floor(i + 1));
         }
     }
+    
+    public static FloorSubsystem getInstance() {
+		if (instance == null) {
+			instance = new FloorSubsystem(new Scheduler());
+		}
+		return instance;
+	}
 
     @Override
     public void run() {
@@ -45,17 +49,13 @@ public class FloorSubsystem implements Runnable {
         for (ElevatorEvent e : eventQueue) {
             scheduler.addEvent(e);
         }
-
+        
         while(true) {
-            if (floorExiting > 0) {
-                System.out.println(Thread.currentThread().getName() + ": people are exiting on floor: " + floorExiting);
-                floorExiting = -1;
-                scheduler.resetFloorExiting();
+            if (getFloorExiting() > 0) {
+               exitFromFloor();
             }
-            if (floorEntering > 0) {
-                System.out.println(Thread.currentThread().getName() + ": people are entering on floor: " + floorEntering);
-                floorEntering = -1;
-                scheduler.resetFloorEntering();
+            if (getFloorEntering() > 0) {
+                enterIntoFloor();
             }
         }
     }
@@ -86,12 +86,16 @@ public class FloorSubsystem implements Runnable {
      * Parses input into a queue of elevator events
      */
     private void readFloorInputFile() {
+    	BufferedReader br = null;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(INPUT_PATH));
+        	String rootProjectPath = new File("").getAbsolutePath();
+            br = new BufferedReader(new FileReader(rootProjectPath.concat("/" + INPUT_PATH)));
             String line = br.readLine(); // First line is just the column names
+     
             String[] lineValues;
-            while (line != null) {
-                line = br.readLine();
+            while ((line = br.readLine()) != null) {
+            	//System.out.println(line);
+                //line = br.readLine();
                 lineValues = line.split("\t");
                 Date elevatorTime = createElevatorTime(lineValues[0]);
                 int elevatorFloor = Integer.parseInt(lineValues[1]);
@@ -110,6 +114,12 @@ public class FloorSubsystem implements Runnable {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        
+        try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
 
@@ -128,6 +138,32 @@ public class FloorSubsystem implements Runnable {
      * @param floor	current floor of the elevator
      */
     public synchronized void setFloorExiting(int floor) {
-        floorExiting= floor;
+        floorExiting = floor;
     }
+    
+    /**
+     * @return the floor that is being entered on
+     */
+    public synchronized int getFloorEntering() {
+		return floorEntering;
+	}
+    
+    /**
+     * @return the floor that is being exited on
+     */
+    public synchronized int getFloorExiting() {
+		return floorExiting;
+	}
+    
+    private void enterIntoFloor() {
+    	//scheduler.resetFloorEntering();
+    	System.out.println(Thread.currentThread().getName() + ": people are entering on floor: " + floorEntering);
+        setFloorEntering(-1);
+	}
+    
+    private void exitFromFloor() {
+    	 //scheduler.resetFloorExiting();
+    	 System.out.println(Thread.currentThread().getName() + ": people are exiting on floor: " + floorExiting);
+         setFloorExiting(-1);
+	}
 }
