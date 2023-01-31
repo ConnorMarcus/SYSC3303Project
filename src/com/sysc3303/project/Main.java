@@ -16,15 +16,14 @@ public class Main {
 	
 	
 	/**
-	 * @param args
-	 * @throws ParseException 
-	 * @throws IllegalArgumentException 
+	 * main method (entry point of program)
 	 */
 	public static void main(String[] args) throws IllegalArgumentException, ParseException {
 		Scheduler s = new Scheduler();
-		FloorSubsystem floor = new FloorSubsystem(s);
-		Thread t1 = new Thread(new Elevator(s), "ElevatorThread");
-		Thread t2 = new Thread(floor, "FloorThread");
+		Floor f = new Floor(s);
+		Elevator e = new Elevator(s);
+		Thread t1 = new Thread(e, "ElevatorThread");
+		Thread t2 = new Thread(f, "FloorThread");
 		Thread t3 = new Thread(s, "SchedulerThread");
 		t1.start();
 		t2.start();
