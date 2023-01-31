@@ -1,86 +1,104 @@
 package com.sysc3303.project;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.*;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
+ * The Floor subsystem
+ * 
  * @author Group 9
  *
  */
-public class Floor {
-
+public class Floor implements Runnable {
 	public static final int NUM_FLOORS = 5;
-	private static final int NUM_CARS = 1;
-
-	private int floorNumber;
-	// The buttons to go up or down on a given floor
-	private HashMap<ElevatorEvent.Direction, FloorButton> floorButtons;
-	// Lamps that light up when a floor button is pressed and turn off when an elevator going in that direction arrives
-	private HashMap<ElevatorEvent.Direction, FloorLamp> floorLamps;
-	// Lamps that light up temporarily to indicate which direction an elevator is going when it arrives, until it leaves
-	private ArrayList<DirectionLamp[]> directionLamps;
-	// Each elevator shaft at each floor has a sensor to detect the presence of an elevator
-	// private ArrayList<ArrivalSensor> arrivalSensors;
-
-	/*
-	TODO:
-	 - Arrival sensors
-	 */
+	public static final int BOTTOM_FLOOR = 1;
+	public static final int NUM_CARS = 1;
+	private static final String INPUT_FILE_PATH = "Resources/floor_input.txt";
+	private final Scheduler scheduler;
+	private final Queue<ElevatorEvent> eventQueue;
+	private final Queue<String> responseQueue;
 
 	/**
-	 * Constructor for a Floor object
-	 * @param floorNumber Which floor number this is
+	 * A constructor for a FloorSubsystem
+	 * 
+	 * @param scheduler The scheduler used to communicate with elevators
 	 */
-	public Floor (int floorNumber) {
-		this.floorNumber = floorNumber;
-
-		floorButtons = new HashMap<>();
-		floorLamps = new HashMap<>();
-		directionLamps = new ArrayList<>();
-
-		// Top floor won't have an up button
-		if (floorNumber < NUM_FLOORS) {
-			floorButtons.put(ElevatorEvent.Direction.UP, new FloorButton(ElevatorEvent.Direction.UP));
-			floorLamps.put(ElevatorEvent.Direction.UP, new FloorLamp(ElevatorEvent.Direction.UP));
-		}
-		// Bottom floor won't have a down button
-		if (floorNumber > 1) {
-			floorButtons.put(ElevatorEvent.Direction.DOWN, new FloorButton(ElevatorEvent.Direction.DOWN));
-			floorLamps.put(ElevatorEvent.Direction.DOWN, new FloorLamp(ElevatorEvent.Direction.DOWN));
-		}
-
-		// Direction lamps and arrival sensors are for every elevator
-		for (int i = 0; i < NUM_CARS; ++i) {
-			DirectionLamp[] elevatorCarDirectionLamps = {
-					new DirectionLamp(ElevatorEvent.Direction.UP),
-					new DirectionLamp(ElevatorEvent.Direction.DOWN)};
-			directionLamps.add(elevatorCarDirectionLamps);
-		}
-	}
-
-	public int getFloorNumber() {
-		return floorNumber;
+	public Floor(Scheduler scheduler) {
+		this.scheduler = scheduler;
+		eventQueue = new ArrayDeque<>();
+		responseQueue = new ArrayDeque<>();
 	}
 
 	/**
-	 * Presses the button to request an elevator in a given direction
-	 * @param requestedDirection Which button to press
-	 * @throws IllegalArgumentException if trying to go above top floor/below bottom floor
+	 * The Floor thread's run method
 	 */
-	public void pressButton(ElevatorEvent.Direction requestedDirection) throws IllegalArgumentException {
-		if (floorButtons.get(requestedDirection) == null) {
-			throw new IllegalArgumentException();
+	@Override
+	public void run() {
+		readFloorInputFile();
+
+		// Send events to scheduler
+		for (ElevatorEvent e : eventQueue) {
+			scheduler.addFloorRequest(new FloorRequest(this, e));
 		}
-		floorButtons.get(requestedDirection).setPressed(true);
-		floorLamps.get(requestedDirection).turnOn();
-		// TODO: make some call?
+		for (int i = 0; i < eventQueue.size(); i++) {
+			System.out.println(Thread.currentThread().getName() + ": " + getLatestResponse());
+		}
+
+		System.exit(0);
 	}
 
-	public void handleElevatorArrival(int elevatorId) {
-		System.out.println("Elevator with ID " + String.valueOf(elevatorId) + " arrived at floor " + String.valueOf(floorNumber));
-		/*
-		add some lamp/button handling
-		 */
+	/**
+	 * @param responseMessage the response message from the elevator
+	 */
+	public synchronized void addResponse(String responseMessage) {
+		responseQueue.add(responseMessage);
+		notifyAll();
+	}
+
+	/**
+	 * @return the response message at the front of the queue
+	 */
+	public synchronized String getLatestResponse() {
+		while (responseQueue.isEmpty()) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		return responseQueue.remove();
+	}
+
+	/**
+	 * Reads the input file for elevator timings Parses input into a queue of
+	 * elevator events
+	 */
+	private void readFloorInputFile() {
+		BufferedReader br = null;
+		try {
+			String rootProjectPath = new File("").getAbsolutePath();
+			br = new BufferedReader(new FileReader(rootProjectPath.concat("/" + INPUT_FILE_PATH)));
+			String line = br.readLine(); // First line is just the column names
+
+			String[] lineValues;
+			while ((line = br.readLine()) != null) {
+				lineValues = line.split(" ");
+				Time elevatorTime = Time.createFromTimeString((lineValues[0]));
+				int elevatorFloor = Integer.parseInt(lineValues[1]);
+				ElevatorEvent.Direction elevatorDirection = ElevatorEvent.Direction.UP;
+				if (lineValues[2].equals("Down"))
+					elevatorDirection = ElevatorEvent.Direction.DOWN;
+				int elevatorButton = Integer.parseInt(lineValues[3]);
+				ElevatorEvent elevatorEvent = new ElevatorEvent(elevatorTime, elevatorFloor, elevatorDirection,
+						elevatorButton);
+				eventQueue.add(elevatorEvent);
+			}
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

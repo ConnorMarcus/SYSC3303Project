@@ -3,245 +3,55 @@
  */
 package com.sysc3303.project;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-
-import com.sysc3303.project.ElevatorEvent.Direction;
-
 /**
- * The Elevator object.
+ * Corresponds to elevators in the Elevator subsystem.
+ * 
  * @author Group 9
  */
 public class Elevator implements Runnable {
-	private final long elevatorID; //a unique elevator ID
 	private final Scheduler scheduler;
-	private int currentFloor;
-	private Direction elevatorDirection;
-	private static final AtomicLong ID = new AtomicLong(0);
-	
-	
-	/**
-	 * @return a unique elevator ID
-	 */
-	private static long getUniqueID() {
-		return ID.getAndIncrement();
-	}
-	
+
 	/**
 	 * Constructor for Elevator object.
+	 * 
 	 * @param scheduler The Elevator Scheduler.
-	 * @param numberOfFloors The number of floors of the Elevator.
 	 */
 	public Elevator(Scheduler scheduler) {
 		this.scheduler = scheduler;
-		this.currentFloor = 1;
-		elevatorDirection = Direction.STOPPED;
-		elevatorID = getUniqueID();
 	}
-	
+
 	/**
 	 * Elevators thread run method.
 	 */
 	@Override
 	public void run() {
 		while (true) {
-			if (getDirection() == Direction.STOPPED) {
-				Set<ElevatorEvent> events = scheduler.consumeEventFromStopped(elevatorID);
-				ElevatorEvent event = events.iterator().next();
-				int floorNumber = event.getFloorNumber();
-				
-				if (getCurrentFloor() != floorNumber) {
-					goToFloor(floorNumber);
-				}
-				
-				elevatorDirection = event.getDirection();
-				enterIntoElevator();
-				getButtonPressFromEvents(events);
-				closeDoors();
-			}
-			else {
-				ElevatorAction action = scheduler.getElevatorAction(elevatorID, getCurrentFloor(), getDirection());
-				respondToElevatorAction(action);
-			}
-			
-			
-			if (elevatorDirection == Direction.UP) {
-				moveUp();
-			}
-			else if (elevatorDirection == Direction.DOWN) {
-				moveDown();
-			}
+			FloorRequest request = scheduler.getNextRequest();
+			processElevatorEvent(request.getElevatorEvent());
+			setResponseForScheduler(request);
 		}
-	}
-	
-	
-	/**
-	 * Goes to the floorNumber floor.
-	 * @param floorNumber the floor number to go to.
-	 */
-	private void goToFloor(int floorNumber) {
-		closeDoors();
-		while (getCurrentFloor() < floorNumber) {
-			moveUp();
-		}
-		while (getCurrentFloor() > floorNumber) {
-			moveDown();
-		}
-		stopMoving();
-	}
-	
-	/**
-	 * Gets the current floor the Elevator is on.
-	 * @return The current floor.
-	 */
-	public synchronized int getCurrentFloor() {
-		return this.currentFloor;
-	}
-	
-	
-	/**
-	 * Increments the current floor.
-	 */
-	private synchronized void incrementCurrentFloor() {
-		this.currentFloor++;		
-	}
-	
-	/**
-	 * Decrement the current floor.
-	 */
-	private synchronized void decrementCurrentFloor() {
-		this.currentFloor--;		
-	}
-	
-	
-	/**
-	 * Gets the direction of the Elevator.
-	 * @return Direction of the Elevator.
-	 */
-	public synchronized Direction getDirection() {
-		return elevatorDirection;
-	}
-	
-	
-	/**
-	 * Sets the direction of the Elevator.
-	 * @param direction the direction of the Elevator.
-	 */
-	private synchronized void setDirection(Direction direction) {
-		this.elevatorDirection = direction;
-	}
-	
-	
-	/**
-	 * Moves the Elevator up one floor.
-	 */
-	private void moveUp() {
-		setDirection(Direction.UP);
-		incrementCurrentFloor();
-		System.out.println(Thread.currentThread().getName() + ": Elevator moving up to floor " + getCurrentFloor());	
 	}
 
 	/**
-	 * Stops the Elevator from moving.
+	 * Helper method to process an ElevatorEvent from the scheduler
+	 * 
+	 * @param event The event currently being processed
 	 */
-	private void stopMoving() {
-		setDirection(Direction.STOPPED);
-		int currentFloor = getCurrentFloor();
-		System.out.println(Thread.currentThread().getName() + ": Elevator is stopping at floor " + currentFloor);
-		System.out.println(Thread.currentThread().getName() + ": Elevator doors opening...");
+	private void processElevatorEvent(ElevatorEvent event) {
+
+		System.out.println(Thread.currentThread().getName() + ": received " + event.toString());
 	}
-	
+
 	/**
-	 * Moves the Elevator down one floor
+	 * Helper method to set a response for the scheduler
+	 * 
+	 * @param request The request currently being processed
 	 */
-	private void moveDown() {
-		setDirection(Direction.DOWN);
-		decrementCurrentFloor();
-		System.out.println(Thread.currentThread().getName() + ": Elevator moving down to floor " + getCurrentFloor());			
+	private void setResponseForScheduler(FloorRequest request) {
+		String responseMessage = request.getElevatorEvent().toString() + " has been processed successfully";
+		Floor responseFloor = request.getFloor();
+		ElevatorResponse response = new ElevatorResponse(responseFloor, responseMessage);
+		scheduler.addElevatorResponse(response);
 	}
-	
-	
-	/**
-	 * Responds to Elevator Action sent by the Scheduler.
-	 * @param action the action sent by the Scheduler.
-	 */
-	private void respondToElevatorAction(ElevatorAction action) {
-		if (action.shouldStop()) {
-			stopMoving();
-			if (action.arePeopleExit()) {
-				exitFromElevator();
-			}
-			if (action.arePeopleEnter()) {
-				enterIntoElevator();
-				pressElevatorButton(action.getCarButtonFloors());	
-			}
-			elevatorDirection = action.getNextDirection();
-			if (elevatorDirection != Direction.STOPPED) closeDoors();
-		}
-	}
-	
-	
-	/**
-	 * Notifies Scheduler that people have entered the Elevator.
-	 */
-	private void enterIntoElevator() {
-		scheduler.setFloorEntering(getCurrentFloor());
-		
-		/*TODO: Implement actual synchronization with FloorSubsytem to wait
-		for people to exit to close doors */
-		try {
-			Thread.sleep(500);
-		} 
-		catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	/**
-	 * Notifies Scheduler that people have exited the Elevator.
-	 */
-	private void exitFromElevator() {
-		System.out.println(Thread.currentThread().getName() + ": Elevator floor button " + getCurrentFloor() + "'s lamp has been turned off");
-		scheduler.setFloorExiting(getCurrentFloor());
-		
-		/*TODO: Implement actual synchronization with FloorSubsytem to wait
-		for people to exit to close doors */
-		try {
-			Thread.sleep(500);
-		} 
-		catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	/**
-	 * Closes the Elevators doors.
-	 */
-	private void closeDoors() {
-		System.out.println(Thread.currentThread().getName() + ": Elevator doors closing...");
-		
-	}
-	
-	private void getButtonPressFromEvents(Set<ElevatorEvent> events) {
-		Set<Integer> buttonFloors = new HashSet<>();
-		for (ElevatorEvent event: events) {
-			buttonFloors.add(event.getCarButton());
-		}
-		pressElevatorButton(buttonFloors);
-	}
-	
-	/**
-	 * Handles outputting a message for the Elevators button.
-	 * @param buttonFloors the integer set of floor numbers the elevator is traveling to.
-	 */
-	private void pressElevatorButton(Set<Integer> buttonFloors) {
-		for (int floor: buttonFloors) {
-			System.out.println(Thread.currentThread().getName() + ": Elevator floor button " + floor + " has been pressed");
-		}
-	}
-	
-	
+
 }
