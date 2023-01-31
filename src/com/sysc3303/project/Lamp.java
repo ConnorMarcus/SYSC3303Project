@@ -1,6 +1,10 @@
 package com.sysc3303.project;
 
-public abstract class Lamp {
+/**
+ * @author Group 9
+ *
+ */
+public class Lamp {
 
     private ElevatorEvent.Direction direction;
     private boolean litUp;

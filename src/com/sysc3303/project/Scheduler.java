@@ -23,11 +23,6 @@ public class Scheduler implements Runnable {
 	private final Map<Long, Set<ElevatorEvent>> curEvents; //Maps Elevator ID to current events to be done by that elevator
 	private int floorEntering;
 	private int floorExiting;
-	private FloorSubsystem floor;
-
-	public void setFloor(FloorSubsystem floor) {
-		this.floor = floor;
-	}
 
 	/**
 	 * Initializes all event queues and sets
@@ -39,9 +34,8 @@ public class Scheduler implements Runnable {
 		curEvents = new HashMap<>();
 		floorEntering = -1; 
 		floorExiting = -1;
-		this.floor = floor;
 		
-		for (int i=1; i<=Main.NUM_FLOORS; i++) {
+		for (int i=1; i<= Floor.NUM_FLOORS; i++) {
 			upFloorQueue.put(i, new HashSet<>());
 			downFloorQueue.put(i, new HashSet<>());
 		}
@@ -50,11 +44,13 @@ public class Scheduler implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			if (floorExiting > 0) {
-				floor.setFloorExiting(floorExiting);
+			if (getFloorExiting() > 0) {
+				FloorSubsystem.getInstance().setFloorExiting(floorExiting);
+				setFloorExiting(-1);
 			} 
-			if (floorEntering > 0) {
-				floor.setFloorEntering(floorEntering);
+			if (getFloorEntering() > 0) {
+				FloorSubsystem.getInstance().setFloorEntering(floorEntering);
+				setFloorEntering(-1);
 			}
 		}
 		
@@ -209,19 +205,26 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
+	 * @return the floor number that is being entered on
+	 */
+	public synchronized int getFloorEntering() {
+		return floorEntering;
+	}
+	
+	/**
+	 * @return the floor number that is being exited on
+	 */
+	public synchronized int getFloorExiting() {
+		return floorExiting;
+	}
+	
+	/**
 	 * Setting what floor people are entering the elevator. 
 	 * 
 	 * @param floor	current floor of the elevator
 	 */
 	public synchronized void setFloorEntering(int floor) {
 		floorEntering = floor;
-		try {
-			wait();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 	}
 	
 	/**
@@ -230,14 +233,7 @@ public class Scheduler implements Runnable {
 	 * @param floor	current floor of the elevator
 	 */
 	public synchronized void setFloorExiting(int floor) {
-		floorExiting= floor;
-		try {
-			wait();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		floorExiting = floor;
 	}
 	
 	/**
@@ -245,7 +241,6 @@ public class Scheduler implements Runnable {
 	 */
 	public synchronized void resetFloorEntering() {
 		floorEntering = -1;
-		notifyAll();
 	}
 	
 	/**
@@ -253,7 +248,6 @@ public class Scheduler implements Runnable {
 	 */
 	public synchronized void resetFloorExiting() {
 		floorExiting = -1;
-		notifyAll();
 	}
 
 }
