@@ -4,17 +4,13 @@
 package com.sysc3303.project;
 
 import java.text.ParseException;
-import java.util.concurrent.atomic.AtomicLong;
-
-import com.sysc3303.project.ElevatorEvent.Direction;
 
 /**
  * @author Group 9
  *
  */
 public class Main {
-	
-	
+
 	/**
 	 * main method (entry point of program)
 	 */
@@ -28,7 +24,7 @@ public class Main {
 		t1.start();
 		t2.start();
 		t3.start();
-		
+
 	}
 
 }
