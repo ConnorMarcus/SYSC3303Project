@@ -6,5 +6,4 @@
  *
  */
 module A3G9_iteration_1 {
-	requires org.junit.jupiter.api;
 }

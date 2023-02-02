@@ -106,36 +106,4 @@ public class Time {
 		}
 
 	}
-	
-	/**
-	 * Getter for the hours attribute
-	 * @return hours
-	 */
-	public String getHours() {
-		return this.hours;
-	}
-	
-	/**
-	 * Getter for the minutes attribute
-	 * @return minutes
-	 */
-	public String getMinutes() {
-		return this.minutes;
-	}
-	
-	/**
-	 * Getter for the seconds attribute
-	 * @return seconds
-	 */
-	public String getSeconds() {
-		return this.seconds;
-	}
-	
-	/**
-	 * Getter for the milliseconds attribute
-	 * @return milliseconds
-	 */
-	public String getMilliseconds() {
-		return this.hours;
-	}
 }
