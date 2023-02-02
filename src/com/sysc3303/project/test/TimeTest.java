@@ -1,15 +1,17 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.sysc3303.project.Time;
+
 /**
- * @author ihasnaou
+ * @author Group 9
  *
  */
 class TimeTest {
