@@ -53,9 +53,5 @@ public class Elevator implements Runnable {
 		ElevatorResponse response = new ElevatorResponse(responseFloor, responseMessage);
 		scheduler.addElevatorResponse(response);
 	}
-	
-	public Scheduler getScheduler() {
-		return this.scheduler;
-	}
 
 }
