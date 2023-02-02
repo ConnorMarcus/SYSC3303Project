@@ -15,25 +15,19 @@ import org.junit.jupiter.api.Test;
  */
 class ElevatorTest {
 	private static Elevator elevator;
+	private static Scheduler scheduler = new Scheduler();
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		elevator = new Elevator(new Scheduler());
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeEach
-	void setUp() throws Exception {
+		elevator = new Elevator(scheduler);
 	}
 
 	@Test
-	void test() {
-		fail("Not yet implemented");
+	void getterTest() {
+		assertEquals(scheduler, elevator.getScheduler());
 	}
 
 }
