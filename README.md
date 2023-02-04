@@ -4,7 +4,7 @@ Group Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patri
 
 ### Files
 
-The following is a brief description of the Java files contained within the project:
+The following is a brief description of the files contained within the Eclipse project:
 - Elevator.java: represents the Elevator subsystem which communicates with the Scheduler to process elevator events.
 - ElevatorEvent.java: represents each text line from the input file as an object.
 EleavtorResponse.java: represents a response object the elevator sends out to the scheduler after an event has occurred.
@@ -20,6 +20,7 @@ EleavtorResponse.java: represents a response object the elevator sends out to th
 - FloorTest.java: tests the Floor class
 - SchedulerTest.java: tests the Scheduler class
 - TimeTest.java: tests the Time class
+- floor_input.txt: This file is located within the Resources folder of the Eclipse project and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
 
 ### Breakdown of Responsibilities
 
