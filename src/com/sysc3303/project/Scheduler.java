@@ -7,10 +7,6 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 /**
- * @author Group 9
- *
- */
-/**
  * The Scheduler class which schedules the elevators and enables communication
  * between the Floor and Elevator subsystems
  * 
@@ -89,7 +85,7 @@ public class Scheduler implements Runnable {
 	 * 
 	 * @return elevatorResponse The next ElevatorResponse object
 	 */
-	public synchronized ElevatorResponse getElevatorResponse() {
+	private synchronized ElevatorResponse getElevatorResponse() {
 		while (responses.isEmpty()) {
 			try {
 				wait();
