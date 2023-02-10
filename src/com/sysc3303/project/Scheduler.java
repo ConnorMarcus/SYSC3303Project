@@ -85,7 +85,7 @@ public class Scheduler implements Runnable {
 	 * 
 	 * @return elevatorResponse The next ElevatorResponse object
 	 */
-	private synchronized ElevatorResponse getElevatorResponse() {
+	public synchronized ElevatorResponse getElevatorResponse() {
 		while (responses.isEmpty()) {
 			try {
 				wait();
