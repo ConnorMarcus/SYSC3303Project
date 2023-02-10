@@ -62,7 +62,7 @@ public class Floor implements Runnable {
 	public synchronized String getLatestResponse() {
 		while (responseQueue.isEmpty()) {
 			try {
-				wait();
+				wait(); // wait if there are no responses available
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -83,6 +83,8 @@ public class Floor implements Runnable {
 			String line = br.readLine(); // First line is just the column names
 
 			String[] lineValues;
+			
+			// read remaining lines from the text file
 			while ((line = br.readLine()) != null) {
 				lineValues = line.split(" ");
 				Time elevatorTime = Time.createFromTimeString((lineValues[0]));

@@ -14,8 +14,9 @@ import java.util.Queue;
  *
  */
 public class Scheduler implements Runnable {
-	private final Queue<FloorRequest> events;
-	private final Queue<ElevatorResponse> responses;
+	private final Queue<FloorRequest> events; //request queue
+	private final Queue<ElevatorResponse> responses; // response queue
+	private SchedulerState state;
 
 	/**
 	 * Constructor; initializes all attributes
@@ -23,6 +24,7 @@ public class Scheduler implements Runnable {
 	public Scheduler() {
 		events = new ArrayDeque<>();
 		responses = new ArrayDeque<>();
+		state = new SchedulerReceivingState();
 	}
 
 	/**
@@ -30,11 +32,31 @@ public class Scheduler implements Runnable {
 	 */
 	@Override
 	public void run() {
+		System.out.println(Thread.currentThread().getName() + ": scheduler currently in state "  + state.toString());
 		while (true) {
 			ElevatorResponse response = getElevatorResponse();
-			response.getFloor().addResponse(response.getMessage());
+			state.handleResponseProcessed(this); // response has been received and processed
+			response.getFloor().addResponse(response.getMessage()); // add response to floor's response queue
 		}
 
+	}
+	
+	/**
+	 * Gets the state of the Scheduler
+	 * 
+	 * @return the state of the Scheduler
+	 */
+	public SchedulerState getState() {
+		return state;
+	}
+	
+	/**
+	 * Sets the state of the Scheduler
+	 * 
+	 * @param state the new state of the Scheduler
+	 */
+	public void setState(SchedulerState state) {
+		this.state = state;
 	}
 
 	/**
@@ -47,7 +69,7 @@ public class Scheduler implements Runnable {
 			throw new IllegalArgumentException("The FloorRequest object cannot be null");
 		}
 		events.add(floorRequest);
-		notifyAll();
+		notifyAll(); // notifies Elevator threads that a floor request is available
 	}
 
 	/**
@@ -58,7 +80,7 @@ public class Scheduler implements Runnable {
 	public synchronized FloorRequest getNextRequest() {
 		while (events.isEmpty()) {
 			try {
-				wait();
+				wait(); // wait until a request is available
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -77,7 +99,7 @@ public class Scheduler implements Runnable {
 			throw new IllegalArgumentException("The ElevatorResponse object cannot be null");
 		}
 		responses.add(response);
-		notifyAll();
+		notifyAll(); // notifies scheduler that response can be sent to Floor thread
 	}
 
 	/**
@@ -88,13 +110,21 @@ public class Scheduler implements Runnable {
 	public synchronized ElevatorResponse getElevatorResponse() {
 		while (responses.isEmpty()) {
 			try {
-				wait();
+				wait(); // waits for response to be available
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				System.exit(1);
 			}
 		}
+		state.handleResponseReceived(this); //handle response received event
 		return responses.remove();
+	}
+	
+	/**
+	 * @return true if there is at least one response in the response queue, and false otherwise
+	 */
+	public synchronized boolean isResponseInQueue() {
+		return !responses.isEmpty();
 	}
 
 }
