@@ -27,6 +27,7 @@ public class ElevatorState {
 	 * @param direction the direction the elevator should move
 	 */
 	public void handleRequest(Elevator elevator, ElevatorEvent.Direction direction) {
+		System.out.println(Thread.currentThread().getName() + ": elevator doors closing");
 		setNewState(elevator, direction.toString());
 	}
 	
@@ -51,6 +52,9 @@ public class ElevatorState {
 	private void setNewState(Elevator elevator, String name) {
 		elevator.setState(new ElevatorState(name));
 		System.out.println(Thread.currentThread().getName() + ": elevator currently in state " + elevator.getState());
+		if (name == ElevatorEvent.Direction.STOPPED.toString() ) {
+			System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
+		}
 	}
 	
 	/**
