@@ -10,6 +10,8 @@ package com.sysc3303.project;
  */
 public class Elevator implements Runnable {
 	private final Scheduler scheduler;
+	private ElevatorState state;
+	private int currentFloor;
 
 	/**
 	 * Constructor for Elevator object.
@@ -18,6 +20,36 @@ public class Elevator implements Runnable {
 	 */
 	public Elevator(Scheduler scheduler) {
 		this.scheduler = scheduler;
+		this.state = new ElevatorState("STOPPED");
+		this.currentFloor = Floor.BOTTOM_FLOOR;
+	}
+	
+	/**
+	 * @return the current state of the elevator
+	 */
+	public ElevatorState getState() {
+		return this.state;
+	}
+	
+	/**
+	 * @param state the state to set the elevator to
+	 */
+	public void setState(ElevatorState state) {
+		this.state = state;
+	}
+	
+	/**
+	 * @return the current floor of the elevator
+	 */
+	public int getCurrentFloor() {
+		return this.currentFloor;
+	}
+	
+	/**
+	 * @param floor the floor to set the elevator to
+	 */
+	public void setCurrentFloor(int floor) {
+		this.currentFloor = floor;
 	}
 
 	/**
@@ -25,10 +57,14 @@ public class Elevator implements Runnable {
 	 */
 	@Override
 	public void run() {
+		System.out.println(Thread.currentThread().getName() + ": elevator starting on floor " + currentFloor + " in state " + state.toString());
 		while (true) {
-			FloorRequest request = scheduler.getNextRequest();
-			processElevatorEvent(request.getElevatorEvent());
-			setResponseForScheduler(request);
+			FloorRequest request = scheduler.getNextRequest(); // gets next request from scheduler to process
+			ElevatorEvent elevatorEvent = request.getElevatorEvent();
+			processElevatorEvent(elevatorEvent);
+			updateState(elevatorEvent.getDirection(), elevatorEvent.getCarButton());
+			System.out.println(Thread.currentThread().getName() + ": people have exited from the elevator");
+			setResponseForScheduler(request); // send response to scheduler
 		}
 	}
 
@@ -40,6 +76,25 @@ public class Elevator implements Runnable {
 	private void processElevatorEvent(ElevatorEvent event) {
 
 		System.out.println(Thread.currentThread().getName() + ": received " + event.toString());
+		int eventFloorNumber = event.getFloorNumber();
+		
+		//Move to the appropriate floor if the elevator is not already there
+		if (currentFloor != eventFloorNumber) {
+			ElevatorEvent.Direction direction = currentFloor < eventFloorNumber ? ElevatorEvent.Direction.UP : ElevatorEvent.Direction.DOWN;
+			updateState(direction, eventFloorNumber);
+		}
+		System.out.println(Thread.currentThread().getName() + ": people have entered into the elevator");
+	}
+	
+	/**
+	 * Helper method to update the state of the elevator.
+	 * 
+	 * @param direction the direction which the elevator is traveling in
+	 * @param floorNumber the floor number which the elevator is going to
+	 */
+	private void updateState(ElevatorEvent.Direction direction, int floorNumber) {
+		state.handleRequest(this, direction); // change state to reflect moving up/down
+		state.handleReachedDestination(this, floorNumber); // change state to reflect reaching destination and stopping
 	}
 
 	/**
@@ -51,7 +106,7 @@ public class Elevator implements Runnable {
 		String responseMessage = request.getElevatorEvent().toString() + " has been processed successfully";
 		Floor responseFloor = request.getFloor();
 		ElevatorResponse response = new ElevatorResponse(responseFloor, responseMessage);
-		scheduler.addElevatorResponse(response);
+		scheduler.addElevatorResponse(response); // add elevator response object to scheduler's response queue
 	}
 	
 	public Scheduler getScheduler() {
