@@ -63,6 +63,7 @@ public class Elevator implements Runnable {
 			ElevatorEvent elevatorEvent = request.getElevatorEvent();
 			processElevatorEvent(elevatorEvent);
 			updateState(elevatorEvent.getDirection(), elevatorEvent.getCarButton());
+			System.out.println(Thread.currentThread().getName() + ": Button " + elevatorEvent.getCarButton() + " Light is OFF");
 			System.out.println(Thread.currentThread().getName() + ": people have exited from the elevator");
 			setResponseForScheduler(request); // send response to scheduler
 		}
@@ -84,6 +85,7 @@ public class Elevator implements Runnable {
 			updateState(direction, eventFloorNumber);
 		}
 		System.out.println(Thread.currentThread().getName() + ": people have entered into the elevator");
+		System.out.println(Thread.currentThread().getName() + ": Button " + event.getCarButton() + " Light is ON");
 	}
 	
 	/**
