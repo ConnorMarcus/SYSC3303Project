@@ -41,6 +41,7 @@ public class ElevatorState {
 		elevator.setCurrentFloor(floorNumber);
 		System.out.println(Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
 		setNewState(elevator, ElevatorEvent.Direction.STOPPED.toString());
+		System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
 	}
 	
 	/**
@@ -52,9 +53,6 @@ public class ElevatorState {
 	private void setNewState(Elevator elevator, String name) {
 		elevator.setState(new ElevatorState(name));
 		System.out.println(Thread.currentThread().getName() + ": elevator currently in state " + elevator.getState());
-		if (name == ElevatorEvent.Direction.STOPPED.toString() ) {
-			System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
-		}
 	}
 	
 	/**
