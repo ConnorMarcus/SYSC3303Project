@@ -92,7 +92,7 @@ public class Scheduler implements Runnable {
 	/**
 	 * Adds an ElevatorResponse to the response queue
 	 * 
-	 * @param elevatorResponse The ElevatorResponse to add
+	 * @param response The ElevatorResponse to add
 	 */
 	public synchronized void addElevatorResponse(ElevatorResponse response) {
 		if (response == null) {
