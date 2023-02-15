@@ -21,7 +21,7 @@ public class Time {
 	 * @param hours        number of hours (24 hour format)
 	 * @param minutes      number of minutes
 	 * @param seconds      number of seconds
-	 * @param milliseconds number of seconds
+	 * @param milliseconds number of milliseconds
 	 */
 	public Time(String hours, String minutes, String seconds, String milliseconds) {
 		if (!isTimeValid(hours, minutes, seconds, milliseconds)) {
