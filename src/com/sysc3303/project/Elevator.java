@@ -20,7 +20,7 @@ public class Elevator implements Runnable {
 	 */
 	public Elevator(Scheduler scheduler) {
 		this.scheduler = scheduler;
-		this.state = new ElevatorState("STOPPED");
+		this.state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
 		this.currentFloor = Floor.BOTTOM_FLOOR;
 	}
 	
