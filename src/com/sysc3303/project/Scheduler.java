@@ -14,17 +14,14 @@ import java.util.Queue;
  *
  */
 public class Scheduler implements Runnable {
-	private final Queue<FloorRequest> events; //request queue
-	private final Queue<ElevatorResponse> responses; // response queue
-	private SchedulerState state;
+	private final Queue<FloorRequest> events = new ArrayDeque<>();; //request queue
+	private final Queue<ElevatorResponse> responses = new ArrayDeque<>(); // response queue
+	private SchedulerState state = new SchedulerReceivingState();
 
 	/**
-	 * Constructor; initializes all attributes
+	 * Constructor; initializes all attributes with default values presented bove
 	 */
 	public Scheduler() {
-		events = new ArrayDeque<>();
-		responses = new ArrayDeque<>();
-		state = new SchedulerReceivingState();
 	}
 
 	/**
@@ -33,7 +30,7 @@ public class Scheduler implements Runnable {
 	@Override
 	public void run() {
 		System.out.println(Thread.currentThread().getName() + ": scheduler currently in state "  + state.toString());
-		while (true) {
+		while (true) { //To ensure that all inputs are always read
 			ElevatorResponse response = getElevatorResponse();
 			state.handleResponseProcessed(this); // response has been received and processed
 			response.getFloor().addResponse(response.getMessage()); // add response to floor's response queue
