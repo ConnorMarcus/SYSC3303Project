@@ -35,7 +35,7 @@ The following is a breakdown of the main responsibilities of each team member:
 - Patrick: JUnit tests, refactoring, README
 - Vahid: ElevatorState.java, state diagram
 
-###Set Up and Test Instructions
+### Set Up and Test Instructions
 The following steps should be taken to run the project in Eclipse:
 1. Load the project into Eclipse using the provided zip inside the submission zip: "LA3G9_milestone_2.zip". To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
 2. Once the project is loaded in Eclipse, it can be run by running Main.java in the "src" directory under the "com.sysc3303.project" package (this file contains the main method).
