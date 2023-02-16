@@ -10,8 +10,8 @@ package com.sysc3303.project;
  */
 public class Elevator implements Runnable {
 	private final Scheduler scheduler;
-	private ElevatorState state;
-	private int currentFloor;
+	private ElevatorState state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
+	private int currentFloor = Floor.BOTTOM_FLOOR;
 
 	/**
 	 * Constructor for Elevator object.
@@ -20,8 +20,6 @@ public class Elevator implements Runnable {
 	 */
 	public Elevator(Scheduler scheduler) {
 		this.scheduler = scheduler;
-		this.state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
-		this.currentFloor = Floor.BOTTOM_FLOOR;
 	}
 	
 	/**
@@ -82,7 +80,7 @@ public class Elevator implements Runnable {
 		//Move to the appropriate floor if the elevator is not already there
 		if (currentFloor != eventFloorNumber) {
 			ElevatorEvent.Direction direction = currentFloor < eventFloorNumber ? ElevatorEvent.Direction.UP : ElevatorEvent.Direction.DOWN;
-			updateState(direction, eventFloorNumber);
+			updateState(direction, eventFloorNumber); //Handle state changes
 		}
 		System.out.println(Thread.currentThread().getName() + ": people have entered into the elevator");
 		System.out.println(Thread.currentThread().getName() + ": Button " + event.getCarButton() + " Light is ON");
