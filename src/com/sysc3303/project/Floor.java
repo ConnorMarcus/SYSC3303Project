@@ -16,8 +16,8 @@ public class Floor implements Runnable {
 	public static final int NUM_CARS = 1;
 	private static final String INPUT_FILE_PATH = "Resources/floor_input.txt";
 	private final Scheduler scheduler;
-	private final Queue<ElevatorEvent> eventQueue;
-	private final Queue<String> responseQueue;
+	private final Queue<ElevatorEvent> eventQueue = new ArrayDeque<>();
+	private final Queue<String> responseQueue = new ArrayDeque<>();
 
 	/**
 	 * A constructor for a FloorSubsystem
@@ -26,8 +26,6 @@ public class Floor implements Runnable {
 	 */
 	public Floor(Scheduler scheduler) {
 		this.scheduler = scheduler;
-		eventQueue = new ArrayDeque<>();
-		responseQueue = new ArrayDeque<>();
 	}
 
 	/**
@@ -92,10 +90,10 @@ public class Floor implements Runnable {
 				ElevatorEvent.Direction elevatorDirection = ElevatorEvent.Direction.UP;
 				if (lineValues[2].equals("Down"))
 					elevatorDirection = ElevatorEvent.Direction.DOWN;
-				int elevatorButton = Integer.parseInt(lineValues[3]);
+				int elevatorButton = Integer.parseInt(lineValues[3]); //Read from input file all necessary info
 				ElevatorEvent elevatorEvent = new ElevatorEvent(elevatorTime, elevatorFloor, elevatorDirection,
-						elevatorButton);
-				eventQueue.add(elevatorEvent);
+						elevatorButton); //Create new instance of ElevatorEvent with info read from file
+				eventQueue.add(elevatorEvent); //Add ElevatorEvent to Queue
 			}
 			br.close();
 		} catch (Exception e) {
