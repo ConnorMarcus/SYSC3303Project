@@ -10,7 +10,7 @@ package com.sysc3303.project;
  */
 public class Elevator implements Runnable {
 	private final Scheduler scheduler;
-	private ElevatorState state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString();
+	private ElevatorState state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
 	private int currentFloor = Floor.BOTTOM_FLOOR;
 
 	/**
