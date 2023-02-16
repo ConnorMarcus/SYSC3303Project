@@ -14,14 +14,17 @@ import java.util.Queue;
  *
  */
 public class Scheduler implements Runnable {
-	private final Queue<FloorRequest> events = new ArrayDeque<>();; //request queue
-	private final Queue<ElevatorResponse> responses = new ArrayDeque<>(); // response queue
-	private SchedulerState state = new SchedulerReceivingState();
+	private final Queue<FloorRequest> events; //request queue
+	private final Queue<ElevatorResponse> responses; // response queue
+	private SchedulerState state; //the state of the scheduler
 
 	/**
-	 * Constructor; initializes all attributes with default values presented bove
+	 * Constructor; initializes all attributes with default values
 	 */
 	public Scheduler() {
+		events = new ArrayDeque<>();
+		responses = new ArrayDeque<>();
+		state = new SchedulerReceivingState();
 	}
 
 	/**
