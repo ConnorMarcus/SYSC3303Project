@@ -1,7 +1,7 @@
-#Group 9 - Iteration 2
+# Group 9 - Iteration 2
 Group Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
 
-###Files
+### Files
 The following is a brief description of the files contained within the project:
 - Elevator.java: represents the Elevator subsystem which communicates with the Scheduler to process elevator events.
 - ElevatorEvent.java: represents each text line from the input file as an object.
@@ -27,7 +27,7 @@ The following is a brief description of the files contained within the project:
 - SchedulerReceivingStateTest.java: tests the SchedulerReceivingState class
 - floor_input.txt: This file is located within the Resources folder of the Eclipse project and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
 
-###Breakdown of Responsibilities
+### Breakdown of Responsibilities
 The following is a breakdown of the main responsibilities of each team member:
 - Connor: SchedulerReceivingState.java, SchedulerReceivingSendingState.java, sequence diagram
 - Ilyes: SchedulerState.java, refactoring, UML class diagram
