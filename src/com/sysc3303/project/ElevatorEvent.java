@@ -3,6 +3,8 @@
  */
 package com.sysc3303.project;
 
+import java.io.Serializable;
+
 /**
  * ElevatorEvents are objects representing the lines of input read in from the
  * Floor subsystem
@@ -10,7 +12,7 @@ package com.sysc3303.project;
  * @author Group 9
  *
  */
-public class ElevatorEvent {
+public class ElevatorEvent implements Serializable {
 	public enum Direction {
 		UP, DOWN, STOPPED;
 	}

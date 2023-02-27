@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterAll;
+
 class ElevatorStateTest {
 
     private static ElevatorState elevatorState;
@@ -19,7 +21,12 @@ class ElevatorStateTest {
     @BeforeAll
     public static void setUpBeforeClass() {
         elevatorState = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
-        elevator = new Elevator(new Scheduler());
+        elevator = new Elevator();
+    }
+    
+    @AfterAll
+    public static void tearDown() {
+    	elevator.closeSocket();
     }
 
     @Test

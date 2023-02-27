@@ -1,6 +1,9 @@
 package com.sysc3303.project;
 
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -13,21 +16,29 @@ import java.util.Queue;
 public class Floor implements Runnable {
 	public static final int NUM_FLOORS = 5;
 	public static final int BOTTOM_FLOOR = 1;
-	public static final int NUM_CARS = 1;
+	public static final int PORT = 5552;
+	public static final InetAddress ADDRESS = UDPUtil.getLocalHost();
 	private static final String INPUT_FILE_PATH = "Resources/floor_input.txt";
-	private final Scheduler scheduler;
+	private final DatagramSocket receiveSocket, sendSocket;
 	private final Queue<ElevatorEvent> eventQueue = new ArrayDeque<>();
 	private final Queue<String> responseQueue = new ArrayDeque<>();
 
 	/**
 	 * A constructor for a FloorSubsystem
-	 * 
-	 * @param scheduler The scheduler used to communicate with elevators
 	 */
-	public Floor(Scheduler scheduler) {
-		this.scheduler = scheduler;
+	public Floor() {
+		receiveSocket = UDPUtil.createDatagramSocket(PORT);
+		sendSocket = UDPUtil.createDatagramSocket();
 	}
 
+	/**
+	 * Closes the sockets associated with the object
+	 */
+	public void closeSockets() {
+		receiveSocket.close();
+		sendSocket.close();
+	}
+	
 	/**
 	 * The Floor thread's run method
 	 */
@@ -35,15 +46,24 @@ public class Floor implements Runnable {
 	public void run() {
 		readFloorInputFile();
 
-		// Send events to scheduler
-		for (ElevatorEvent e : eventQueue) {
-			scheduler.addFloorRequest(new FloorRequest(this, e));
-		}
-		for (int i = 0; i < eventQueue.size(); i++) {
-			System.out.println(Thread.currentThread().getName() + ": " + getLatestResponse());
-		}
+		Thread sendToScheduler = new Thread(() -> {
+			// Send events to scheduler
+			for (ElevatorEvent e : eventQueue) {
+				sendFloorRequest(new FloorRequest(e));
+			}
+			sendSocket.close();
+		});
+		
+		Thread receiveResponses = new Thread(() -> {
+			for (int i = 0; i < eventQueue.size(); i++) {
+				receiveResponse();
+				System.out.println(Thread.currentThread().getName() + ": " + getLatestResponse());
+			}
+			receiveSocket.close();
+		}, "FloorThread");
 
-		System.exit(0);
+		sendToScheduler.start();
+		receiveResponses.start();
 	}
 
 	/**
@@ -67,6 +87,27 @@ public class Floor implements Runnable {
 			}
 		}
 		return responseQueue.remove();
+	}
+	
+	/**
+	 * Receives a response packet from the Scheduler subsystem
+	 */
+	private void receiveResponse() {
+		DatagramPacket responsePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
+		UDPUtil.receivePacket(receiveSocket, responsePacket);
+		String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
+		addResponse(response);
+	}
+	
+	/**
+	 * Sends a FloorRequest object to the Scheduler subsystem
+	 * 
+	 * @param request the FloorRequest to send
+	 */
+	private void sendFloorRequest(FloorRequest request) {
+		byte[] data = UDPUtil.convertToBytes(request);
+		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.FLOOR_REQUEST_PORT);
+		UDPUtil.sendPacket(sendSocket, packet);
 	}
 
 	/**
@@ -101,4 +142,12 @@ public class Floor implements Runnable {
 		}
 	}
 
+	
+	/**
+	 * Entry point for the Floor subsystem
+	 */
+	public static void main(String[] args) {
+		Thread floorThread = new Thread(new Floor(), "FloorSubsystem");
+		floorThread.start();
+	}
 }

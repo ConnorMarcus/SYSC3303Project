@@ -5,6 +5,7 @@ package com.sysc3303.project.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +24,13 @@ class FloorTest {
 	 */
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		floor = new Floor(new Scheduler());
+		floor = new Floor();
 	}
+	
+	@AfterAll
+    public static void tearDown() {
+    	floor.closeSockets();
+    }
 
 	@Test
 	void test() {

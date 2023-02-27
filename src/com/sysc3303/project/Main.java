@@ -3,6 +3,7 @@
  */
 package com.sysc3303.project;
 
+import java.util.Arrays;
 
 /**
  * @author Group 9
@@ -11,18 +12,19 @@ package com.sysc3303.project;
 public class Main {
 
 	/**
-	 * main method (entry point of program)
+	 * FOR TESTING ONLY (REMOVE CLASS)
 	 */
 	public static void main(String[] args) {
-		Scheduler s = new Scheduler();
-		Floor f = new Floor(s);
-		Elevator e = new Elevator(s);
-		Thread t1 = new Thread(e, "ElevatorThread");
-		Thread t2 = new Thread(f, "FloorThread");
-		Thread t3 = new Thread(s, "SchedulerThread");
-		t1.start();
-		t2.start();
-		t3.start();
+		FloorRequest request = new FloorRequest(new ElevatorEvent(new Time("5", "12", "30", "123"), 1, ElevatorEvent.Direction.UP, 4));
+		System.out.println(request.getElevatorEvent());
+		byte[] bytes = UDPUtil.convertToBytes(request);
+		System.out.println("length: " + bytes.length);
+		for (byte b : bytes) {
+			System.out.print(b + ", ");
+		}
+		System.out.println();
+		FloorRequest request2 = (FloorRequest) UDPUtil.convertFromBytes(bytes, bytes.length);
+		System.out.println(request2.getElevatorEvent());
 
 	}
 

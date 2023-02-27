@@ -3,13 +3,15 @@
  */
 package com.sysc3303.project;
 
+import java.io.Serializable;
+
 /**
  * Represents the time that a request was made at in the format hh:mm:ss.mmm
  * 
  * @author Group 9
  *
  */
-public class Time {
+public class Time implements Serializable {
 	private final String hours;
 	private final String minutes;
 	private final String seconds;

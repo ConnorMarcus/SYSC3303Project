@@ -3,23 +3,25 @@
  */
 package com.sysc3303.project;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+
 /**
  * Corresponds to elevators in the Elevator subsystem.
  * 
  * @author Group 9
  */
 public class Elevator implements Runnable {
-	private final Scheduler scheduler;
 	private ElevatorState state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
 	private int currentFloor = Floor.BOTTOM_FLOOR;
+	public static final int NUM_CARS = 1;
+	private final DatagramSocket socket;
 
 	/**
 	 * Constructor for Elevator object.
-	 * 
-	 * @param scheduler The Elevator Scheduler.
 	 */
-	public Elevator(Scheduler scheduler) {
-		this.scheduler = scheduler;
+	public Elevator() {
+		socket = UDPUtil.createDatagramSocket();
 	}
 	
 	/**
@@ -49,6 +51,13 @@ public class Elevator implements Runnable {
 	public void setCurrentFloor(int floor) {
 		this.currentFloor = floor;
 	}
+	
+	/**
+	 * Closes the socket associated with the elevator object
+	 */
+	public void closeSocket() {
+		socket.close();
+	}
 
 	/**
 	 * Elevators thread run method.
@@ -57,7 +66,7 @@ public class Elevator implements Runnable {
 	public void run() {
 		System.out.println(Thread.currentThread().getName() + ": elevator starting on floor " + currentFloor + " in state " + state.toString());
 		while (true) {
-			FloorRequest request = scheduler.getNextRequest(); // gets next request from scheduler to process
+			FloorRequest request = getNextFloorRequest(); // gets next request from scheduler to process
 			ElevatorEvent elevatorEvent = request.getElevatorEvent();
 			processElevatorEvent(elevatorEvent);
 			updateState(elevatorEvent.getDirection(), elevatorEvent.getCarButton());
@@ -65,6 +74,18 @@ public class Elevator implements Runnable {
 			System.out.println(Thread.currentThread().getName() + ": people have exited from the elevator");
 			setResponseForScheduler(request); // send response to scheduler
 		}
+	}
+	
+	/**
+	 * @return the next FloorRequest object from the scheduler
+	 */
+	private FloorRequest getNextFloorRequest() {
+		byte[] data = (Thread.currentThread().getName() + " can service new request").getBytes();
+		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
+		UDPUtil.sendPacket(socket, packet);
+		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
+		UDPUtil.receivePacket(socket, receivePacket);
+		return (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 	}
 
 	/**
@@ -104,13 +125,30 @@ public class Elevator implements Runnable {
 	 */
 	private void setResponseForScheduler(FloorRequest request) {
 		String responseMessage = request.getElevatorEvent().toString() + " has been processed successfully";
-		Floor responseFloor = request.getFloor();
-		ElevatorResponse response = new ElevatorResponse(responseFloor, responseMessage);
-		scheduler.addElevatorResponse(response); // add elevator response object to scheduler's response queue
+		ElevatorResponse response = new ElevatorResponse(responseMessage);
+		sendElevatorResponse(response);
 	}
 	
-	public Scheduler getScheduler() {
-		return this.scheduler;
+	/**
+	 * Adds elevator response object to scheduler's response queue
+	 * 
+	 * @param response the response object to send to the scheduler
+	 */
+	private void sendElevatorResponse(ElevatorResponse response) {
+		byte[] data = UDPUtil.convertToBytes(response);
+		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_RESPONSE_PORT);
+		UDPUtil.sendPacket(socket, packet);
+	}
+	
+	
+	/**
+	 * Main method for the Elevator Subsystem
+	 */
+	public static void main(String[] args) {
+		for (int i=0; i<NUM_CARS; i++) {
+			Thread t = new Thread(new Elevator(), "ElevatorThread-" + (i+1));
+			t.start();
+		}
 	}
 
 }
