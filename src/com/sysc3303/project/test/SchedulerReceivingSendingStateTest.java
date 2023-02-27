@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.AfterAll;
+
 public class SchedulerReceivingSendingStateTest {
 
     private static Scheduler scheduler;
@@ -20,6 +22,11 @@ public class SchedulerReceivingSendingStateTest {
     public static void setUpBeforeClass() throws Exception {
         scheduler = new Scheduler();
         receivingSendingState = new SchedulerReceivingSendingState();
+    }
+    
+    @AfterAll
+    public static void tearDown() {
+    	scheduler.closeSockets();
     }
 
     @Test

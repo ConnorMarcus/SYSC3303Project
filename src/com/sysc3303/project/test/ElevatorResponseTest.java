@@ -18,19 +18,17 @@ import com.sysc3303.project.Scheduler;
  */
 class ElevatorResponseTest {
 	private static ElevatorResponse elevatorResponse;
-	private static Floor floor = new Floor(new Scheduler());
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		elevatorResponse = new ElevatorResponse(floor, "Testing");
+		elevatorResponse = new ElevatorResponse("Testing");
 	}
 
 	@Test
 	void gettersTest() {
-		assertEquals(floor, elevatorResponse.getFloor());
 		assertEquals("Testing", elevatorResponse.getMessage());
 	}
 

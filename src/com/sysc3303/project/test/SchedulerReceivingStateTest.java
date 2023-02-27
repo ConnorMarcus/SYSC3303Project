@@ -5,6 +5,8 @@ package com.sysc3303.project.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterAll;
+
 import com.sysc3303.project.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,6 +28,11 @@ class SchedulerReceivingStateTest {
     public static void setUpBeforeClass() throws Exception {
         scheduler = new Scheduler();
         receivingState = new SchedulerReceivingState();
+    }
+    
+    @AfterAll
+    public static void tearDown() {
+    	scheduler.closeSockets();
     }
 
     @Test

@@ -5,6 +5,8 @@ package com.sysc3303.project.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterAll;
+
 import com.sysc3303.project.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,20 +34,21 @@ class SchedulerTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@AfterEach
-	public void tearDown() throws Exception {
+	@AfterAll
+	public static void tearDown() throws Exception {
+		scheduler.closeSockets();
 	}
 
 	@Test
 	public void testFloorRequest() {
-		FloorRequest floorRequest = new FloorRequest(new Floor(scheduler), new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4 ));
+		FloorRequest floorRequest = new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4 ));
 		scheduler.addFloorRequest(floorRequest);
 		assertEquals(floorRequest, scheduler.getNextRequest());
 	}
 	
 	@Test
 	public void testElevatorResponse() {
-		ElevatorResponse elevatorResponse = new ElevatorResponse(new Floor(scheduler), "Done!");
+		ElevatorResponse elevatorResponse = new ElevatorResponse("Done!");
 		scheduler.addElevatorResponse(elevatorResponse);
 		assertEquals(elevatorResponse, scheduler.getElevatorResponse());
 	}
@@ -53,16 +56,17 @@ class SchedulerTest {
 	// Don't need to test with threads like in Elevator test, unit testing scheduler states is equivalent
 	@Test
 	public void testSetAndDefaultState() {
-		Scheduler s = new Scheduler(); // new to not be affected by other tests
-		assertEquals(s.getState().toString(), RECEIVING_STRING);
+		assertEquals(scheduler.getState().toString(), RECEIVING_STRING);
 
-		s.setState(new SchedulerReceivingState());
-		assertEquals(s.getState().toString(), RECEIVING_STRING);
+		scheduler.setState(new SchedulerReceivingState());
+		assertEquals(scheduler.getState().toString(), RECEIVING_STRING);
 
-		s.setState(new SchedulerReceivingSendingState());
-		assertEquals(s.getState().toString(), RECEIVING_SENDING_STRING);
+		scheduler.setState(new SchedulerReceivingSendingState());
+		assertEquals(scheduler.getState().toString(), RECEIVING_SENDING_STRING);
 
-		s.setState(new SchedulerReceivingSendingState());
-		assertEquals(s.getState().toString(), RECEIVING_SENDING_STRING);
+		scheduler.setState(new SchedulerReceivingSendingState());
+		assertEquals(scheduler.getState().toString(), RECEIVING_SENDING_STRING);
+		
+		scheduler.setState(new SchedulerReceivingState()); //return to initial state
 	}
 }
