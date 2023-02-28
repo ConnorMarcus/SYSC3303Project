@@ -61,7 +61,34 @@ public class Time implements Serializable {
 			return intSecs < intOtherSecs;
 		return intMiliSecs < intOtherMiliSecs;
 	}
-
+	
+	/**
+	 * 
+	 * @param otherTime
+	 * @return time in milliseconds between time and otherTime
+	 */
+	public Integer getTimeDifferenceInMS(Time otherTime) {
+		final int HOUR_TO_MS = 3600000;
+		final int MIN_TO_MS = 60000; 
+		final int SEC_TO_MS = 1000; 
+		
+		int intHours = Integer.parseInt(hours);
+		int intMins = Integer.parseInt(minutes);
+		int intSecs = Integer.parseInt(seconds);
+		int intMiliSecs = Integer.parseInt(milliseconds);
+		int intOtherHours = Integer.parseInt(otherTime.hours);
+		int intOtherMins = Integer.parseInt(otherTime.minutes);
+		int intOtherSecs = Integer.parseInt(otherTime.seconds);
+		int intOtherMiliSecs = Integer.parseInt(otherTime.milliseconds);
+		
+		int resHours = (intOtherHours - intHours) * HOUR_TO_MS; 
+		int resMins = (intOtherMins - intMins) * MIN_TO_MS; 
+		int resSecs = (intOtherSecs - intSecs) * SEC_TO_MS; 
+		int resMiliSecs = intOtherMiliSecs - intMiliSecs;
+		
+		return resHours + resMins + resSecs + resMiliSecs; 
+	} 
+	
 	/**
 	 * String representation of this object
 	 */
