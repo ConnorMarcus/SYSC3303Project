@@ -47,9 +47,20 @@ public class Floor implements Runnable {
 		readFloorInputFile();
 
 		Thread sendToScheduler = new Thread(() -> {
+			Time currentTime, previousTime; 
+			previousTime = eventQueue.peek().getTime(); 
 			// Send events to scheduler
 			for (ElevatorEvent e : eventQueue) {
 				sendFloorRequest(new FloorRequest(e));
+				currentTime = e.getTime(); 
+				int milliseconds = previousTime.getTimeDifferenceInMS(currentTime);
+				try {
+					Thread.sleep(milliseconds);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				previousTime = currentTime; 
+		
 			}
 			sendSocket.close();
 		});

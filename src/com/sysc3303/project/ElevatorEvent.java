@@ -57,6 +57,13 @@ public class ElevatorEvent implements Serializable {
 				&& !(direction == Direction.UP && floor > carButton)
 				&& !(direction == Direction.DOWN && floor < carButton));
 	}
+	
+	/**
+	 * @return the time on which the elevator request was made
+	 */
+	public Time getTime() {
+		return time; 
+	}
 
 	/**
 	 * @return the floor number on which the elevator request was made

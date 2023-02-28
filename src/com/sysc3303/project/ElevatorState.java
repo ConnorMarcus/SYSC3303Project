@@ -10,6 +10,9 @@ package com.sysc3303.project;
  */
 public class ElevatorState {
 	private String stateName;
+	private final int TIME_REACH_FLOOR_BEFORE_DOORS_OPEN = 1000; 
+	private final int TIME_DOORS_OPEN = 3000; 
+	private final int TIME_TO_MOVE_AFTER_DOORS_CLOSE = 2000; 
 	
 	/**
 	 * Constructor; initializes ElevatorState with the state name.
@@ -27,6 +30,11 @@ public class ElevatorState {
 	 * @param direction the direction the elevator should move
 	 */
 	public void handleRequest(Elevator elevator, ElevatorEvent.Direction direction) {
+		try {
+			Thread.sleep(TIME_TO_MOVE_AFTER_DOORS_CLOSE);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		System.out.println(Thread.currentThread().getName() + ": elevator doors closing");
 		setNewState(elevator, direction.toString());
 	}
@@ -38,10 +46,17 @@ public class ElevatorState {
 	 * @param floorNumber the floor number that the elevator is stopping at
 	 */
 	public void handleReachedDestination(Elevator elevator, int floorNumber) {
-		elevator.setCurrentFloor(floorNumber);
-		System.out.println(Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
-		setNewState(elevator, ElevatorEvent.Direction.STOPPED.toString());
-		System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
+		try {
+			elevator.setCurrentFloor(floorNumber);
+			System.out.println(Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
+			setNewState(elevator, ElevatorEvent.Direction.STOPPED.toString());
+			Thread.sleep(TIME_REACH_FLOOR_BEFORE_DOORS_OPEN);
+			System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
+			Thread.sleep(TIME_DOORS_OPEN);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**
