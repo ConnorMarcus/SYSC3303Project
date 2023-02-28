@@ -15,15 +15,23 @@ import com.sysc3303.project.Time;
  *
  */
 class TimeTest {
-	private static Time time;
+	private static Time time, time2, time3;
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		time = new Time("1", "1", "1", "1");
+		time2 = new Time("1", "1", "1", "10");
+		time3 = new Time("1", "1", "2", "1"); 
 	}
 
+	@Test
+	void timeDifferenceTest() {
+		assertEquals(9, time.getTimeDifferenceInMS(time2));
+		assertEquals(1000, time.getTimeDifferenceInMS(time3));
+		assertEquals(991, time2.getTimeDifferenceInMS(time3));
+	}
 	@Test
 	void isTimeBeforeTest() {
 		assertEquals(true, time.isTimeBefore(new Time("1", "1", "1", "2")));
