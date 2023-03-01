@@ -114,7 +114,7 @@ public class Elevator implements Runnable {
 	 * @param floorNumber the floor number which the elevator is going to
 	 */
 	private void updateState(ElevatorEvent.Direction direction, int floorNumber) {
-		state.handleRequest(this, direction); // change state to reflect moving up/down
+		state.handleRequest(this, direction, floorNumber); // change state to reflect moving up/down
 		state.handleReachedDestination(this, floorNumber); // change state to reflect reaching destination and stopping
 	}
 
