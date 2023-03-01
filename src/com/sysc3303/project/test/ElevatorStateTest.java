@@ -44,16 +44,16 @@ class ElevatorStateTest {
     @Test
     public void testHandleRequest() {
         // Elevator object's initial state is STOPPED
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN, 1);
         assertEquals(DOWN_STRING, elevator.getState().toString());
         // Try going down from down state
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN, 0);
         assertEquals(DOWN_STRING, elevator.getState().toString());
 
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP, 2);
         assertEquals(UP_STRING, elevator.getState().toString());
         // Try going up from up state
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP, 4);
         assertEquals(UP_STRING, elevator.getState().toString());
     }
 
@@ -64,19 +64,19 @@ class ElevatorStateTest {
         elevatorState.handleReachedDestination(elevator, 0);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
         // Stop from moving up to top floor
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP, 2);
         elevatorState.handleReachedDestination(elevator, Floor.NUM_FLOORS);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
         // Stop from moving up to bottom floor somehow
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.UP, 4);
         elevatorState.handleReachedDestination(elevator, Floor.BOTTOM_FLOOR);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
         // Stop from moving down to bottom floor
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN, 2);
         elevatorState.handleReachedDestination(elevator, Floor.BOTTOM_FLOOR);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
         // Stop from moving down to top floor somehow
-        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN);
+        elevatorState.handleRequest(elevator, ElevatorEvent.Direction.DOWN, 1);
         elevatorState.handleReachedDestination(elevator, Floor.NUM_FLOORS);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
     }
