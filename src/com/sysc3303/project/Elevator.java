@@ -14,7 +14,7 @@ import java.net.DatagramSocket;
 public class Elevator implements Runnable {
 	private ElevatorState state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
 	private int currentFloor = Floor.BOTTOM_FLOOR;
-	public static final int NUM_CARS = 1;
+	public static final int NUM_CARS = 3;
 	private final DatagramSocket socket;
 
 	/**
@@ -80,7 +80,7 @@ public class Elevator implements Runnable {
 	 * @return the next FloorRequest object from the scheduler
 	 */
 	private FloorRequest getNextFloorRequest() {
-		byte[] data = (Thread.currentThread().getName() + " can service new request").getBytes();
+		byte[] data = UDPUtil.convertToBytes(currentFloor);
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 		UDPUtil.sendPacket(socket, packet);
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
@@ -146,7 +146,7 @@ public class Elevator implements Runnable {
 	 */
 	public static void main(String[] args) {
 		for (int i=0; i<NUM_CARS; i++) {
-			Thread t = new Thread(new Elevator(), "ElevatorThread-" + (i+1));
+			Thread t = new Thread(new Elevator(), "ElevatorThread-" + (i + 1));
 			t.start();
 		}
 	}

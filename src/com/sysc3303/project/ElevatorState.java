@@ -32,7 +32,7 @@ public class ElevatorState {
 	public void handleRequest(Elevator elevator, ElevatorEvent.Direction direction) {
 		System.out.println(Thread.currentThread().getName() + ": elevator doors closing");
 		setNewState(elevator, direction.toString());
-		try { 
+    try { 
 			Thread.sleep(TIME_TO_MOVE_AFTER_DOORS_CLOSE);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
