@@ -7,6 +7,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -18,6 +20,7 @@ import java.util.Queue;
  */
 public class Scheduler implements Runnable {
 	private final Queue<FloorRequest> events; //request queue
+	private final List<DatagramPacket> elevatorRequestPackets;
 	private final Queue<ElevatorResponse> responses; // response queue
 	private SchedulerState state; //the state of the scheduler
 	public static final int FLOOR_REQUEST_PORT = 4999; //Port for floor subsystem to send requests to
@@ -31,6 +34,7 @@ public class Scheduler implements Runnable {
 	 */
 	public Scheduler() {
 		events = new ArrayDeque<>();
+		elevatorRequestPackets = new ArrayList<>();
 		responses = new ArrayDeque<>();
 		state = new SchedulerReceivingState();
 		elevatorRequestSocket = UDPUtil.createDatagramSocket(ELEVATOR_REQUEST_PORT);
@@ -66,21 +70,28 @@ public class Scheduler implements Runnable {
 			}
 		}, "SchedulerThread-2");
 		
+		Thread sendToElevator = new Thread(() -> {
+			while (true) {
+				sendRequestToElevator();
+			}
+		}, "SchedulerThread-3");
+		
 		Thread responsesFromElevator = new Thread(() -> {
 			while (true) {
 				receiveResponseFromElevator();
 			}
-		}, "SchedulerThread-3");
+		}, "SchedulerThread-4");
 		
 		Thread sendToFloor = new Thread(() -> {
 			while (true) {
 				sendResponseToFloor();
 			}
-		}, "SchedulerThread-4");
+		}, "SchedulerThread-5");
 		
 		//start scheduler threads
 		requestsFromFloor.start();
 		requestsFromElevator.start();
+		sendToElevator.start();
 		responsesFromElevator.start();
 		sendToFloor.start();
 	}
@@ -120,18 +131,27 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * Receives a request from an elevator and sends it back a floor request
+	 * Receives a request from an elevator 
 	 */
 	private void receiveRequestFromElevator() {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(elevatorRequestSocket, receivePacket);
+		addElevatorRequestPacket(receivePacket);
+	}
+	
+	/**
+	 * Sends a floor request to an elevator
+	 */
+	private void sendRequestToElevator() {
 		FloorRequest request = getNextRequest();
 		byte[] data = UDPUtil.convertToBytes(request);
-		DatagramPacket sendPacket = new DatagramPacket(data, data.length, receivePacket.getAddress(), receivePacket.getPort());
+		DatagramPacket requestPacket = getClosestElevator(request.getElevatorEvent().getFloorNumber());
+		DatagramPacket sendPacket = new DatagramPacket(data, data.length, requestPacket.getAddress(), requestPacket.getPort());
 		DatagramSocket socket = UDPUtil.createDatagramSocket(); 
 		UDPUtil.sendPacket(socket, sendPacket);
 		socket.close();
 	}
+	
 	
 	/**
 	 * Gets the state of the Scheduler
@@ -152,7 +172,7 @@ public class Scheduler implements Runnable {
 	}
 
 	/**
-	 * Adds a FloorRequest to the request queue
+	 * Adds a FloorRequest to the request and direction queue.
 	 * 
 	 * @param floorRequest The FloorRequest to add
 	 */
@@ -161,9 +181,10 @@ public class Scheduler implements Runnable {
 			throw new IllegalArgumentException("The FloorRequest object cannot be null");
 		}
 		events.add(floorRequest);
+		
 		notifyAll(); // notifies threads that a floor request is available
 	}
-
+	
 	/**
 	 * Gets and removes the FloorRequest at the head of the queue
 	 * 
@@ -178,7 +199,43 @@ public class Scheduler implements Runnable {
 				System.exit(1);
 			}
 		}
+		
 		return events.remove();
+	}
+	
+	/**
+	 * Gets the closest Elevator to the floorRequest
+	 * 
+	 * @param floorNum The floor number from the Floor Request
+	 * @return DatagramPacket from closest Elevator
+	 */
+	private synchronized DatagramPacket getClosestElevator(int floorNum) {
+		while (elevatorRequestPackets.isEmpty()) {
+			try {
+				wait(); // wait for request from elevator
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		
+		int index = 0;
+		DatagramPacket closestPacket = elevatorRequestPackets.get(index);
+		int elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength()); 
+		int closest = Math.abs(floorNum - elevatorFloorNum);
+		
+		for (int i = 1; i < elevatorRequestPackets.size(); i++) {
+			DatagramPacket packet = elevatorRequestPackets.get(i);
+			elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(packet.getData(), packet.getLength());
+			int difference = Math.abs(elevatorFloorNum - floorNum);
+			
+			if (difference < closest) {
+				closest = difference;
+				index = i;
+			}
+		}
+		
+		return elevatorRequestPackets.remove(index);	
 	}
 
 	/**
@@ -217,6 +274,20 @@ public class Scheduler implements Runnable {
 	 */
 	public synchronized boolean isResponseInQueue() {
 		return !responses.isEmpty();
+	}
+	
+	/**
+	 * Adds an ElevatorRequest packet to the elevatorRequestPackets ArrayList
+	 * 
+	 * @param packet The ElevatorRequest packet to add
+	 */
+	private synchronized void addElevatorRequestPacket(DatagramPacket packet) {
+		if (packet == null) {
+			throw new IllegalArgumentException("The DatagramPacket cannot be null");
+		}
+		
+		elevatorRequestPackets.add(packet);
+		notifyAll();
 	}
 	
 	/**
