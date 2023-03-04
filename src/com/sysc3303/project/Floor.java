@@ -106,6 +106,7 @@ public class Floor implements Runnable {
 	private void receiveResponse() {
 		DatagramPacket responsePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(receiveSocket, responsePacket);
+		System.out.println("Floor: Received response from Scheduler");
 		String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
 		addResponse(response);
 	}
@@ -119,6 +120,7 @@ public class Floor implements Runnable {
 		byte[] data = UDPUtil.convertToBytes(request);
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.FLOOR_REQUEST_PORT);
 		UDPUtil.sendPacket(sendSocket, packet);
+		System.out.println("Floor: Sent FloorRequest object to Scheduler");
 	}
 
 	/**
