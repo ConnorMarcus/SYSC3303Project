@@ -27,6 +27,14 @@ public class FloorRequest implements Serializable {
 	}
 
 	/**
+	 * Checks if a FloorRequest denotes that all meaningful requests have been processed
+	 * @return true if this request is the last one, false otherwise
+	 */
+	public boolean isEndOfRequests() {
+		return elevatorEvent.isEndOfRequestsEvent();
+	}
+
+	/**
 	 * @return the ElevatorEvent object of the request
 	 */
 	public ElevatorEvent getElevatorEvent() {

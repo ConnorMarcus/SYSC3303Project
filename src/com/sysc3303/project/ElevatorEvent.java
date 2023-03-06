@@ -22,6 +22,10 @@ public class ElevatorEvent implements Serializable {
 	private final Direction direction;
 	private final int carButtonNumber;
 
+	private static final int END_OF_REQUESTS_NUMBER = -1; // The floor to set for the final invalid request
+	private static final Time END_OF_REQUESTS_TIME = new Time("1","1","1","1");
+	private static final Direction END_OF_REQUESTS_DIRECTION = Direction.STOPPED;
+
 	/**
 	 * @param time      the Time object corresponding to the time of the elevator
 	 *                  request
@@ -33,7 +37,7 @@ public class ElevatorEvent implements Serializable {
 	 *                                  being created is invalid
 	 */
 	public ElevatorEvent(Time time, int floor, Direction direction, int carButton) throws IllegalArgumentException {
-		if (!isEventValid(time, floor, direction, carButton)) {
+		if (!isEventValid(time, floor, direction, carButton) && !isValidEndOfRequestsEvent(time, floor, direction, carButton)) {
 			throw new IllegalArgumentException("Cannot create this ElevatorEvent as it would be invalid!");
 		}
 		this.time = time;
@@ -92,6 +96,37 @@ public class ElevatorEvent implements Serializable {
 	 */
 	public boolean eventOccursBefore(ElevatorEvent otherEvent) {
 		return this.time.isTimeBefore(otherEvent.time);
+	}
+
+	/**
+	 * Factory method for an ElevatorEvent that signifies that all requests have been sent
+	 * @return ElevatorEvent that denotes the program should finish
+	 */
+	public static ElevatorEvent createEndOfRequestsEvent() {
+		return new ElevatorEvent(END_OF_REQUESTS_TIME,
+				END_OF_REQUESTS_NUMBER,
+				END_OF_REQUESTS_DIRECTION,
+				END_OF_REQUESTS_NUMBER);
+	}
+
+	/**
+	 * @param time      the Time object for the event
+	 * @param floor     the floor on which the elevator request was made
+	 * @param direction the direction of the elevator request
+	 * @param carButton the car button (button on inside of elevator) that was
+	 *                  pressed in the elevator request
+	 * @return true if the parameters would form a valid final event, and false otherwise
+	 */
+	private boolean isValidEndOfRequestsEvent(Time time, int floor, Direction direction, int carButton) {
+		return time.getTimeDifferenceInMS(END_OF_REQUESTS_TIME) == 0 && floor == END_OF_REQUESTS_NUMBER &&
+				direction == END_OF_REQUESTS_DIRECTION && carButton == END_OF_REQUESTS_NUMBER;
+	}
+
+	/** Checks if an ElevatorEvent signifies that all requests have been sent
+	 * @return true if the event is a valid final event, and false otherwise
+	 */
+	public boolean isEndOfRequestsEvent() {
+		return isValidEndOfRequestsEvent(this.time, this.floorNumber, this.direction, this.carButtonNumber);
 	}
 
 	/**

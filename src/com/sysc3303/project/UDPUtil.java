@@ -84,6 +84,16 @@ public class UDPUtil {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Blocks until a packet received, but as opposed to receivePacket(), throws an exception so it can be handled
+	 * when the socket that is waiting is closed
+	 * @param socket the socket to receive the packet
+	 * @param packet the packet that will be filled
+	 */
+	public static void receivePacketInterruptable(DatagramSocket socket, DatagramPacket packet) throws IOException {
+		socket.receive(packet);
+	}
 	
 	/**
 	 * Serializes an object into an array of bytes

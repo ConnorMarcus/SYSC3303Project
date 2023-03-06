@@ -62,6 +62,8 @@ public class Floor implements Runnable {
 				previousTime = currentTime; 
 		
 			}
+			sendEndOfRequestsNotice();
+
 			sendSocket.close();
 		});
 		
@@ -117,6 +119,16 @@ public class Floor implements Runnable {
 	 */
 	private void sendFloorRequest(FloorRequest request) {
 		byte[] data = UDPUtil.convertToBytes(request);
+		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.FLOOR_REQUEST_PORT);
+		UDPUtil.sendPacket(sendSocket, packet);
+	}
+
+	/**
+	 * Communicates with the Scheduler that all FloorRequests have been sent
+	 */
+	private void sendEndOfRequestsNotice() {
+		FloorRequest endRequest = new FloorRequest(ElevatorEvent.createEndOfRequestsEvent());
+		byte[] data = UDPUtil.convertToBytes(endRequest);
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.FLOOR_REQUEST_PORT);
 		UDPUtil.sendPacket(sendSocket, packet);
 	}

@@ -28,6 +28,7 @@ public class Scheduler implements Runnable {
 	public static final int ELEVATOR_RESPONSE_PORT = 5556; //Port for elevator to send response objects to
 	public static final InetAddress ADDRESS = UDPUtil.getLocalHost();
 	public final DatagramSocket responseSocket, elevatorRequestSocket, floorRequestSocket;
+	private boolean waitForRequests = true;
 
 	/**
 	 * Constructor; initializes all attributes with default values
@@ -59,31 +60,31 @@ public class Scheduler implements Runnable {
 		System.out.println(Thread.currentThread().getName() + ": scheduler currently in state "  + state.toString());
 		
 		Thread requestsFromFloor = new Thread(() -> {
-			while (true) {
+			while (waitForRequests) {
 				receiveRequestFromFloor();
 			}
 		}, "SchedulerThread-1");
 		
 		Thread requestsFromElevator = new Thread(() -> {
-			while (true) {
+			while (waitForRequests) {
 				receiveRequestFromElevator();
 			}
 		}, "SchedulerThread-2");
 		
 		Thread sendToElevator = new Thread(() -> {
-			while (true) {
+			while (waitForRequests) {
 				sendRequestToElevator();
 			}
 		}, "SchedulerThread-3");
 		
 		Thread responsesFromElevator = new Thread(() -> {
-			while (true) {
+			while (waitForRequests) {
 				receiveResponseFromElevator();
 			}
 		}, "SchedulerThread-4");
 		
 		Thread sendToFloor = new Thread(() -> {
-			while (true) {
+			while (waitForRequests) {
 				sendResponseToFloor();
 			}
 		}, "SchedulerThread-5");
@@ -103,6 +104,10 @@ public class Scheduler implements Runnable {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(floorRequestSocket, receivePacket);
 		FloorRequest request = (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
+		if (request.isEndOfRequests()) {
+			waitForRequests = false;
+			return;
+		}
 		addFloorRequest(request);
 	}
 	
@@ -143,13 +148,21 @@ public class Scheduler implements Runnable {
 	 * Sends a floor request to an elevator
 	 */
 	private void sendRequestToElevator() {
+
 		FloorRequest request = getNextRequest();
+
 		byte[] data = UDPUtil.convertToBytes(request);
 		DatagramPacket requestPacket = getClosestElevator(request.getElevatorEvent().getFloorNumber());
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, requestPacket.getAddress(), requestPacket.getPort());
-		DatagramSocket socket = UDPUtil.createDatagramSocket(); 
+		DatagramSocket socket = UDPUtil.createDatagramSocket();
 		UDPUtil.sendPacket(socket, sendPacket);
 		socket.close();
+
+		if (request.isEndOfRequests()) {
+			// the request we sent stopped the elevator threads and the program should be done now
+			// Send a packet to each elevator to terminate
+			return;
+		}
 	}
 	
 	
@@ -191,7 +204,7 @@ public class Scheduler implements Runnable {
 	 * @return The next FloorRequest in the queue
 	 */
 	public synchronized FloorRequest getNextRequest() {
-		while (events.isEmpty()) {
+		while (events.isEmpty() && waitForRequests) {
 			try {
 				wait(); // wait until a request is available
 			} catch (InterruptedException e) {
@@ -199,8 +212,12 @@ public class Scheduler implements Runnable {
 				System.exit(1);
 			}
 		}
-		
-		return events.remove();
+
+		if (waitForRequests) { // while the program is still running
+			return events.remove();
+		}
+		// Another thread received a floorrequest indicating the end of requests
+		return new FloorRequest(ElevatorEvent.createEndOfRequestsEvent());
 	}
 	
 	/**
