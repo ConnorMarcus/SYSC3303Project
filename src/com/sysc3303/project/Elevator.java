@@ -19,7 +19,6 @@ public class Elevator implements Runnable {
 	public static final int NUM_CARS = 3;
 	private final DatagramSocket socket;
 	private static ArrayList<Elevator> elevators = new ArrayList<>();
-	private boolean keepRunning = true;
 
 	/**
 	 * Constructor for Elevator object.
@@ -69,12 +68,10 @@ public class Elevator implements Runnable {
 	@Override
 	public void run() {
 		System.out.println(Thread.currentThread().getName() + ": elevator starting on floor " + currentFloor + " in state " + state.toString());
-		while (keepRunning) {
+		while (true) {
 			FloorRequest request = getNextFloorRequest(); // gets next request from scheduler to process
-			if (!keepRunning) break; // when socket closed
 			if (request.isEndOfRequests()) {
-				closeElevatorSockets();
-				break;
+				exitElevatorSubsystem();
 			}
 			ElevatorEvent elevatorEvent = request.getElevatorEvent();
 			processElevatorEvent(elevatorEvent);
@@ -83,7 +80,6 @@ public class Elevator implements Runnable {
 			System.out.println(Thread.currentThread().getName() + ": people have exited from the elevator");
 			setResponseForScheduler(request); // send response to scheduler
 		}
-		System.out.println(Thread.currentThread().getName() + " has shut down");
 	}
 
 	/**
@@ -97,7 +93,6 @@ public class Elevator implements Runnable {
 		try {
 			UDPUtil.receivePacketInterruptable(socket, receivePacket);
 		} catch (IOException e) {
-			keepRunning = false;
 			return new FloorRequest(ElevatorEvent.createEndOfRequestsEvent()); // not used
 		}
 		return (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
@@ -164,6 +159,11 @@ public class Elevator implements Runnable {
 			Elevator elevator = elevators.remove(0);
 			elevator.closeSocket();
 		}
+	}
+	
+	private void exitElevatorSubsystem() {
+		closeElevatorSockets();
+		System.exit(1);
 	}
 	
 	/**

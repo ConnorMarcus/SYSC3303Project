@@ -155,12 +155,6 @@ public class Scheduler implements Runnable {
 		DatagramSocket socket = UDPUtil.createDatagramSocket();
 		UDPUtil.sendPacket(socket, sendPacket);
 		socket.close();
-
-		if (request.isEndOfRequests()) {
-			// the request we sent stopped the elevator threads and the program should be done now
-			// Send a packet to each elevator to terminate
-			return;
-		}
 	}
 	
 	
