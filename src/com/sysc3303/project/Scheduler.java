@@ -104,6 +104,9 @@ public class Scheduler implements Runnable {
 		UDPUtil.receivePacket(floorRequestSocket, receivePacket);
 		FloorRequest request = (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 		addFloorRequest(request);
+		if (request.isEndOfRequests()) {
+			shutDownScheduler();
+		}
 	}
 	
 	/**
@@ -143,13 +146,21 @@ public class Scheduler implements Runnable {
 	 * Sends a floor request to an elevator
 	 */
 	private void sendRequestToElevator() {
+
 		FloorRequest request = getNextRequest();
+
 		byte[] data = UDPUtil.convertToBytes(request);
 		DatagramPacket requestPacket = getClosestElevator(request.getElevatorEvent().getFloorNumber());
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, requestPacket.getAddress(), requestPacket.getPort());
-		DatagramSocket socket = UDPUtil.createDatagramSocket(); 
+		DatagramSocket socket = UDPUtil.createDatagramSocket();
 		UDPUtil.sendPacket(socket, sendPacket);
 		socket.close();
+
+		if (request.isEndOfRequests()) {
+			// the request we sent stopped the elevator threads and the program should be done now
+			// Send a packet to each elevator to terminate
+			return;
+		}
 	}
 	
 	
@@ -199,7 +210,6 @@ public class Scheduler implements Runnable {
 				System.exit(1);
 			}
 		}
-		
 		return events.remove();
 	}
 	
@@ -289,7 +299,16 @@ public class Scheduler implements Runnable {
 		elevatorRequestPackets.add(packet);
 		notifyAll();
 	}
-	
+
+	private void shutDownScheduler() {
+		// Send message to elevator to shut down
+		sendRequestToElevator();
+		System.out.println("Scheduler notified Elevator subsystem of end of requests, shutting down");
+
+		closeSockets();
+		System.exit(0);
+	}
+
 	/**
 	 * Entry point to Scheduler subsystem
 	 */

@@ -3,8 +3,10 @@
  */
 package com.sysc3303.project;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.ArrayList;
 
 /**
  * Corresponds to elevators in the Elevator subsystem.
@@ -16,6 +18,8 @@ public class Elevator implements Runnable {
 	private int currentFloor = Floor.BOTTOM_FLOOR;
 	public static final int NUM_CARS = 3;
 	private final DatagramSocket socket;
+	private static ArrayList<Elevator> elevators = new ArrayList<>();
+	private boolean keepRunning = true;
 
 	/**
 	 * Constructor for Elevator object.
@@ -65,8 +69,13 @@ public class Elevator implements Runnable {
 	@Override
 	public void run() {
 		System.out.println(Thread.currentThread().getName() + ": elevator starting on floor " + currentFloor + " in state " + state.toString());
-		while (true) {
+		while (keepRunning) {
 			FloorRequest request = getNextFloorRequest(); // gets next request from scheduler to process
+			if (!keepRunning) break; // when socket closed
+			if (request.isEndOfRequests()) {
+				closeElevatorSockets();
+				break;
+			}
 			ElevatorEvent elevatorEvent = request.getElevatorEvent();
 			processElevatorEvent(elevatorEvent);
 			updateState(elevatorEvent.getDirection(), elevatorEvent.getCarButton());
@@ -74,8 +83,9 @@ public class Elevator implements Runnable {
 			System.out.println(Thread.currentThread().getName() + ": people have exited from the elevator");
 			setResponseForScheduler(request); // send response to scheduler
 		}
+		System.out.println(Thread.currentThread().getName() + " has shut down");
 	}
-	
+
 	/**
 	 * @return the next FloorRequest object from the scheduler
 	 */
@@ -84,7 +94,12 @@ public class Elevator implements Runnable {
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 		UDPUtil.sendPacket(socket, packet);
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
-		UDPUtil.receivePacket(socket, receivePacket);
+		try {
+			UDPUtil.receivePacketInterruptable(socket, receivePacket);
+		} catch (IOException e) {
+			keepRunning = false;
+			return new FloorRequest(ElevatorEvent.createEndOfRequestsEvent()); // not used
+		}
 		return (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 	}
 
@@ -139,14 +154,26 @@ public class Elevator implements Runnable {
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_RESPONSE_PORT);
 		UDPUtil.sendPacket(socket, packet);
 	}
-	
+
+	/**
+	 * Closes the socket for each elevator so they are not waiting to receive from the scheduler after
+	 * an elevator has already received the final message from the scheduler
+	 */
+	private static void closeElevatorSockets() {
+		while (elevators.size() > 0) {
+			Elevator elevator = elevators.remove(0);
+			elevator.closeSocket();
+		}
+	}
 	
 	/**
 	 * Main method for the Elevator Subsystem
 	 */
 	public static void main(String[] args) {
 		for (int i=0; i<NUM_CARS; i++) {
-			Thread t = new Thread(new Elevator(), "ElevatorThread-" + (i + 1));
+			Elevator e = new Elevator();
+			elevators.add(e);
+			Thread t = new Thread(e, "ElevatorThread-" + (i + 1));
 			t.start();
 		}
 	}
