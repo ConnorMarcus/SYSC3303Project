@@ -103,10 +103,12 @@ public class Scheduler implements Runnable {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(floorRequestSocket, receivePacket);
 		FloorRequest request = (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
-		addFloorRequest(request);
+		
 		if (request.isEndOfRequests()) {
-			shutDownScheduler();
+			shutDownScheduler(request); //shutdown scheduler subsystem if end of requests
 		}
+		
+		addFloorRequest(request);
 	}
 	
 	/**
@@ -146,9 +148,16 @@ public class Scheduler implements Runnable {
 	 * Sends a floor request to an elevator
 	 */
 	private void sendRequestToElevator() {
-
 		FloorRequest request = getNextRequest();
-
+		sendRequestToElevator(request);
+	}
+	
+	/**
+	 * Sends a floor request to an elevator
+	 * 
+	 * @param request The request to send to the elevator
+	 */
+	private void sendRequestToElevator(FloorRequest request) {
 		byte[] data = UDPUtil.convertToBytes(request);
 		DatagramPacket requestPacket = getClosestElevator(request.getElevatorEvent().getFloorNumber());
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, requestPacket.getAddress(), requestPacket.getPort());
@@ -156,7 +165,6 @@ public class Scheduler implements Runnable {
 		UDPUtil.sendPacket(socket, sendPacket);
 		socket.close();
 	}
-	
 	
 	/**
 	 * Gets the state of the Scheduler
@@ -294,9 +302,14 @@ public class Scheduler implements Runnable {
 		notifyAll();
 	}
 
-	private void shutDownScheduler() {
+	/**
+	 * Shuts down the Scheduler subsystem and forwards on the request to the Elevator subsystem
+	 * 
+	 * @param request The request to be forwarded on to the Elevator subsystem
+	 */
+	private void shutDownScheduler(FloorRequest request) {
 		// Send message to elevator to shut down
-		sendRequestToElevator();
+		sendRequestToElevator(request);
 		System.out.println("Scheduler notified Elevator subsystem of end of requests, shutting down");
 
 		closeSockets();
