@@ -22,6 +22,7 @@ public class Floor implements Runnable {
 	private final DatagramSocket receiveSocket, sendSocket;
 	private final Queue<ElevatorEvent> eventQueue = new ArrayDeque<>();
 	private final Queue<String> responseQueue = new ArrayDeque<>();
+	private boolean waitForResponses = true;
 
 	/**
 	 * A constructor for a FloorSubsystem
@@ -62,8 +63,8 @@ public class Floor implements Runnable {
 				previousTime = currentTime; 
 		
 			}
+			waitForAllResponses();
 			sendEndOfRequestsNotice();
-
 			sendSocket.close();
 		});
 		
@@ -73,6 +74,7 @@ public class Floor implements Runnable {
 				System.out.println(Thread.currentThread().getName() + ": " + getLatestResponse());
 			}
 			receiveSocket.close();
+			stopWaiting();
 		}, "FloorThread");
 
 		sendToScheduler.start();
@@ -162,6 +164,21 @@ public class Floor implements Runnable {
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private synchronized void stopWaiting() {
+		waitForResponses = false;
+		notifyAll();
+	}
+
+	private synchronized void waitForAllResponses() {
+		while (waitForResponses) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

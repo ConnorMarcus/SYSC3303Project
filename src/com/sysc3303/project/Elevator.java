@@ -162,16 +162,8 @@ public class Elevator implements Runnable {
 	private static void closeElevatorSockets() {
 		while (elevators.size() > 0) {
 			Elevator elevator = elevators.remove(0);
-			elevator.getSocket().close();
+			elevator.closeSocket();
 		}
-	}
-
-	/**
-	 * Gets the socket used for communication with the Scheduler
-	 * @return DatagramSocket, between this Elevator and the Scheduler
-	 */
-	public DatagramSocket getSocket() {
-		return socket;
 	}
 	
 	/**
