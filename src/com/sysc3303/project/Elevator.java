@@ -163,7 +163,7 @@ public class Elevator implements Runnable {
 	
 	private void exitElevatorSubsystem() {
 		closeElevatorSockets();
-		System.exit(1);
+		System.exit(0);
 	}
 	
 	/**
