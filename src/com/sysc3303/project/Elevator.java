@@ -90,11 +90,7 @@ public class Elevator implements Runnable {
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 		UDPUtil.sendPacket(socket, packet);
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
-		try {
-			UDPUtil.receivePacketInterruptable(socket, receivePacket);
-		} catch (IOException e) {
-			return new FloorRequest(ElevatorEvent.createEndOfRequestsEvent()); // not used
-		}
+		UDPUtil.receivePacket(socket, receivePacket);
 		return (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 	}
 
@@ -155,8 +151,7 @@ public class Elevator implements Runnable {
 	 * an elevator has already received the final message from the scheduler
 	 */
 	private static void closeElevatorSockets() {
-		while (elevators.size() > 0) {
-			Elevator elevator = elevators.remove(0);
+		for (Elevator elevator : elevators) {
 			elevator.closeSocket();
 		}
 	}
