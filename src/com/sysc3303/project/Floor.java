@@ -22,7 +22,6 @@ public class Floor implements Runnable {
 	private final DatagramSocket receiveSocket, sendSocket;
 	private final Queue<ElevatorEvent> eventQueue = new ArrayDeque<>();
 	private final Queue<String> responseQueue = new ArrayDeque<>();
-	private boolean waitForResponses = true;
 
 	/**
 	 * A constructor for a FloorSubsystem
@@ -63,8 +62,6 @@ public class Floor implements Runnable {
 				previousTime = currentTime; 
 		
 			}
-			waitForAllResponses();
-			sendEndOfRequestsNotice();
 			sendSocket.close();
 		});
 		
@@ -73,8 +70,8 @@ public class Floor implements Runnable {
 				receiveResponse();
 				System.out.println(Thread.currentThread().getName() + ": " + getLatestResponse());
 			}
+			sendEndOfRequestsNotice();
 			receiveSocket.close();
-			stopWaiting();
 		}, "FloorThread");
 
 		sendToScheduler.start();
@@ -132,7 +129,9 @@ public class Floor implements Runnable {
 		FloorRequest endRequest = new FloorRequest(ElevatorEvent.createEndOfRequestsEvent());
 		byte[] data = UDPUtil.convertToBytes(endRequest);
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.FLOOR_REQUEST_PORT);
-		UDPUtil.sendPacket(sendSocket, packet);
+		DatagramSocket endRequestSocket = UDPUtil.createDatagramSocket();
+		UDPUtil.sendPacket(endRequestSocket, packet);
+		endRequestSocket.close();
 	}
 
 	/**
@@ -166,22 +165,6 @@ public class Floor implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
-	private synchronized void stopWaiting() {
-		waitForResponses = false;
-		notifyAll();
-	}
-
-	private synchronized void waitForAllResponses() {
-		while (waitForResponses) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	
 	/**
 	 * Entry point for the Floor subsystem
