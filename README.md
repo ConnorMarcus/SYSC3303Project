@@ -26,7 +26,8 @@ The following is a brief description of the Java files contained within the proj
 - **Vahid**: 
 
 ## Usage 
-Run the project in Eclipse:
+
+### Run the project in Eclipse:
 
 1. Load the project into Eclipse using the provided zip inside the submission zip: "LA3G9_milestone_3.zip". To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
 
@@ -37,7 +38,8 @@ Run the project in Eclipse:
 ***NOTE:*** if the program is run on three different computers the IP addresses of the computers running Scheduler.java and Floor.java must be set. To get the IP address of the computer run: (Windows) ipconfig /all (get the Ipv4 address) or
 (Mac) ifconfig -l (get inet address)
 
-Run the JUnit test cases for the project:
+### Run the JUnit test cases for the project:
+
 1. Follow the previous steps to set up the project in Eclipse.
 
 2. To run a single test case open the "com.sysc3303.project.test" package in the “src” directory then click on any JUnit Test Class. Now in the Drop down menu select Run > Run As > JUnit Test.
