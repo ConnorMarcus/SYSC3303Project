@@ -14,7 +14,7 @@ The following is a brief description of the Java files contained within the proj
 - `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
 - `SchedulerReceivingSendingState.java` represents the concrete state of the scheduler when it can receive and respond to requests
 - `Time.java` represents the time stamp from the input file request in the following format: hh:mm:ss.mmm
-- `UDPUtil.java` a utility class for UPD-related functions such as: creating sockets, packets, sending and receiving packets, etc.
+- `UDPUtil.java` is a utility class for UPD-related functions such as: creating sockets, packets, sending and receiving packets, etc.
 - `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
 - The above classes all have an associated JUnit test file
 
