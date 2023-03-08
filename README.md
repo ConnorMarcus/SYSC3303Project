@@ -10,9 +10,9 @@ The following is a brief description of the files contained within the project:
 - `Floor.java` represents the floor subsystem which handles the parsing of the input file and communicating that with the Scheduler.
 - `FloorRequest.java` represents a request made from the floor subsystem to the Scheduler.
 - `Scheduler.java` represents the Scheduler subsystem which communicates with both the floor and elevator subsystems.
-- `SchedulerReceivingSendingState.java` represents the concrete state of the scheduler when it can receive and respond to requests
-- `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
 - `SchedulerState.java` represents the state of the Scheduler subsystem.
+- `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
+- `SchedulerReceivingSendingState.java` represents the concrete state of the scheduler when it can receive and respond to requests
 - `Time.java` represents the time stamp from the input file request in the following format: hh:mm:ss.mmm
 - `Main.java` the main class to execute the program.
 - `floor_input.txt` This file is located within the Resources folder of the Eclipse project and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
