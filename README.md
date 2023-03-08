@@ -9,30 +9,21 @@ The following is a brief description of the files contained within the project:
 - `EleavtorResponse.java` represents a response object the elevator sends out to the scheduler after an event has occurred.
 - `Floor.java` represents the floor subsystem which handles the parsing of the input file and communicating that with the Scheduler.
 - `FloorRequest.java` represents a request made from the floor subsystem to the Scheduler.
-- `Main.java` the main class to execute the program.
 - `Scheduler.java` represents the Scheduler subsystem which communicates with both the floor and elevator subsystems.
 - `SchedulerReceivingSendingState.java` represents the concrete state of the scheduler when it can receive and respond to requests
 - `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
 - `SchedulerState.java` represents the state of the Scheduler subsystem.
 - `Time.java` represents the time stamp from the input file request in the following format: hh:mm:ss.mmm
-- `ElevatorEventTest.java` tests the ElevatorEvent class
-- `ElevatorResponseTest.java` tests the ElevatorResponse class
-- `ElevatorTest.java` tests the Elevator class
-- `FloorRequestTest.java` tests the FloorRequest class
-- `FloorTest.java` tests the Floor class
-- `SchedulerTest.java` tests the Scheduler class
-- `TimeTest.java` tests the Time class
-- `ElevatorStateTest.java` tests the ElevatorState class
-- `SchedulerReceivingSendingStateTest.java` tests the SchedulerReceivingSendingState class
-- `SchedulerReceivingStateTest.java` tests the SchedulerReceivingState class
+- `Main.java` the main class to execute the program.
 - `floor_input.txt` This file is located within the Resources folder of the Eclipse project and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
+- The above classes all have an associated JUnit test file
 
 ## Breakdown of Responsibilities
-- Connor:  
-- Ilyes: UML class diagram
-- Noah: JUnit tests
-- Patrick: sequence diagram
-- Vahid: README
+- **Connor**:  
+- **Ilyes**: UML class diagram
+- **Noah**: JUnit tests
+- **Patrick**: sequence diagram
+- **Vahid**: README
 
 ## Usage
 Run the project:
