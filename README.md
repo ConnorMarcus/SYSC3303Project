@@ -19,11 +19,11 @@ The following is a brief description of the Java files contained within the proj
 - The above classes all have an associated JUnit test file
 
 ## Breakdown of Responsibilities 
-- **Connor**: 
-- **Ilyes**: 
-- **Noah**:
-- **Patrick**: 
-- **Vahid**: 
+- **Connor**: UDPUtil.java, updated Scheduler, Elevator, and Floor
+- **Ilyes**: UML Class diagram, updated Scheduler and Floor
+- **Noah**: JUnit test cases, updated Scheduler, Elevator, and Floor
+- **Patrick**: Sequence diagram, updated Scheduler, Elevator, and Floor
+- **Vahid**: README, updated ElevatorState, ElevatorEvent, Floor, and Time
 
 ## Usage 
 
@@ -33,10 +33,19 @@ The following is a brief description of the Java files contained within the proj
 
 2. Once the project is loaded in Eclipse, it can be run by running the following files in this order: Scheduler.java, Elevator.java, and floor.java in the "src" directory under the "com.sysc3303.project" package (each file contains a main method).
 
-3. Once the project has been run, you should see output in the console corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
+- It can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses of the computers running Scheduler.java and Floor.java must be set. 
+To get the IP address of the computer run the following commands:
 
-***NOTE:*** if the program is run on three different computers the IP addresses of the computers running Scheduler.java and Floor.java must be set. To get the IP address of the computer run: (Windows) ipconfig /all (get the Ipv4 address) or
-(Mac) ifconfig -l (get inet address)
+  - **Windows:** get the Ipv4 address
+    ```
+    ipconfig /all 
+    ```
+  - **Mac:**
+    ```
+    curl ifconfig.me
+    ```
+
+3. Once the project has been run, you should see output in the console corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
 
 ### Run the JUnit test cases for the project:
 
