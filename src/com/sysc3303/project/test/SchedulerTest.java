@@ -5,10 +5,11 @@ package com.sysc3303.project.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.net.DatagramPacket;
+
 import org.junit.jupiter.api.AfterAll;
 
 import com.sysc3303.project.*;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -68,5 +69,39 @@ class SchedulerTest {
 		assertEquals(scheduler.getState().toString(), RECEIVING_SENDING_STRING);
 		
 		scheduler.setState(new SchedulerReceivingState()); //return to initial state
+	}
+	
+	@Test 
+	public void testAddElevatorRequestPacket() {
+		byte[] data = UDPUtil.convertToBytes(7);
+		DatagramPacket testPacket = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
+		
+		byte[] data2 = UDPUtil.convertToBytes(1);
+		DatagramPacket testPacket2 = new DatagramPacket(data2, data2.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
+		
+		byte[] data3 = UDPUtil.convertToBytes(4);
+		DatagramPacket testPacket3 = new DatagramPacket(data3, data3.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
+
+		scheduler.addElevatorRequestPacket(testPacket);
+		scheduler.addElevatorRequestPacket(testPacket2);
+		scheduler.addElevatorRequestPacket(testPacket3);
+		
+		assertNotNull(scheduler.getElevatorRequestPackets());
+		assertEquals(3, scheduler.getElevatorRequestPackets().size());
+	}
+	
+	@Test 
+	public void testGetClosestElevator() {
+		DatagramPacket closestPacket = scheduler.getClosestElevator(2);
+		int elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength());
+		assertEquals(1, elevatorFloorNum);
+		
+		DatagramPacket closestPacket2 = scheduler.getClosestElevator(5);
+		int elevatorFloorNum2 = (Integer) UDPUtil.convertFromBytes(closestPacket2.getData(), closestPacket2.getLength());
+		assertEquals(4, elevatorFloorNum2);
+		
+		DatagramPacket closestPacket3 = scheduler.getClosestElevator(6);
+		int elevatorFloorNum3 = (Integer) UDPUtil.convertFromBytes(closestPacket3.getData(), closestPacket3.getLength());
+		assertEquals(7, elevatorFloorNum3);
 	}
 }

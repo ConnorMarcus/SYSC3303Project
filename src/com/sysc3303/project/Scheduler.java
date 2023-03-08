@@ -221,7 +221,7 @@ public class Scheduler implements Runnable {
 	 * @param floorNum The floor number from the Floor Request
 	 * @return DatagramPacket from closest Elevator
 	 */
-	private synchronized DatagramPacket getClosestElevator(int floorNum) {
+	public synchronized DatagramPacket getClosestElevator(int floorNum) {
 		while (elevatorRequestPackets.isEmpty()) {
 			try {
 				wait(); // wait for request from elevator
@@ -289,11 +289,18 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
+	 * Gets the ElevatorRequestPacket ArrayList (Used for testing)
+	 */
+	public List<DatagramPacket> getElevatorRequestPackets() {
+		return elevatorRequestPackets;
+	}
+	
+	/**
 	 * Adds an ElevatorRequest packet to the elevatorRequestPackets ArrayList
 	 * 
 	 * @param packet The ElevatorRequest packet to add
 	 */
-	private synchronized void addElevatorRequestPacket(DatagramPacket packet) {
+	public synchronized void addElevatorRequestPacket(DatagramPacket packet) {
 		if (packet == null) {
 			throw new IllegalArgumentException("The DatagramPacket cannot be null");
 		}
