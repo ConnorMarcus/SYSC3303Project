@@ -31,10 +31,9 @@ The following is a brief description of the Java files contained within the proj
 
 1. Load the project into Eclipse using the provided zip inside the submission zip: "LA3G9_milestone_3.zip". To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
 
-2. Once the project is loaded in Eclipse, it can be run by running the following files in this order: Scheduler.java, Elevator.java, and floor.java in the "src" directory under the "com.sysc3303.project" package (each file contains a main method).
+2. Once the project is loaded in Eclipse, it can be run by running the following files in this order: Scheduler.java, Elevator.java, and Floor.java in the "src" directory under the "com.sysc3303.project" package (each file contains a main method).
 
-- It can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses of the computers running Scheduler.java and Floor.java must be set. 
-To get the IP address of the computer run the following commands:
+- It can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses in Scheduler.java and Floor.java must be set (change the ADDRESS constants). To get the IP address of the computer run the following commands:
 
   - **Windows:** get the Ipv4 address
     ```
@@ -44,6 +43,7 @@ To get the IP address of the computer run the following commands:
     ```
     curl ifconfig.me
     ```
+- The number of elevators that are running can be changed by changing the NUM_CARS constant in Elevator.java.
 
 3. Once the project has been run, you should see output in the console corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
 
