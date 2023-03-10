@@ -21,7 +21,7 @@ import java.util.Queue;
 public class Scheduler implements Runnable {
 	private final Queue<FloorRequest> events = new ArrayDeque<>(); //request queue
 	private final List<DatagramPacket> elevatorRequestPackets = new ArrayList<>();
-	private final Queue<ElevatorResponse> responses; // response queue
+	private final Queue<ElevatorResponse> responses = new ArrayDeque<>(); // response queue
 	private SchedulerState state = new SchedulerReceivingState(); //the state of the scheduler
 	public static final int FLOOR_REQUEST_PORT = 4999; //Port for floor subsystem to send requests to
 	public static final int ELEVATOR_REQUEST_PORT = 5555; //Port for elevators to send requests to
