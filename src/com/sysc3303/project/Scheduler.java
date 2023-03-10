@@ -102,7 +102,6 @@ public class Scheduler implements Runnable {
 	private void receiveRequestFromFloor() {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(floorRequestSocket, receivePacket);
-		System.out.println("Scheduler: Received request from Floor subsystem");
 		FloorRequest request = (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 		
 		if (request.isEndOfRequests()) {
@@ -121,7 +120,6 @@ public class Scheduler implements Runnable {
 		byte[] data = response.getMessage().getBytes();
 		DatagramPacket packet = new DatagramPacket(data, data.length, Floor.ADDRESS, Floor.PORT);
 		UDPUtil.sendPacket(socket, packet);
-		System.out.println("Scheduler: Sent response to Floor subsystem");
 		socket.close();
 		state.handleResponseProcessed(this); // response has been received and processed
 	}
@@ -132,7 +130,6 @@ public class Scheduler implements Runnable {
 	private void receiveResponseFromElevator() {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(responseSocket, receivePacket);
-		System.out.println("Scheduler: Received response from Elevator");
 		ElevatorResponse response = (ElevatorResponse) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 		addElevatorResponse(response);
 		
@@ -144,7 +141,6 @@ public class Scheduler implements Runnable {
 	private void receiveRequestFromElevator() {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(elevatorRequestSocket, receivePacket);
-		System.out.println("Scheduler: Received request from Elevator");
 		addElevatorRequestPacket(receivePacket);
 	}
 	
@@ -167,7 +163,6 @@ public class Scheduler implements Runnable {
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, requestPacket.getAddress(), requestPacket.getPort());
 		DatagramSocket socket = UDPUtil.createDatagramSocket();
 		UDPUtil.sendPacket(socket, sendPacket);
-		System.out.println("Scheduler: Sent request to Elevator);
 		socket.close();
 	}
 	

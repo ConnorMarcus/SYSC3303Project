@@ -8,9 +8,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.net.DatagramPacket;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 
 import com.sysc3303.project.*;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,16 +29,16 @@ class SchedulerTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@BeforeAll
-	public static void setUpBeforeClass() throws Exception {
+	@BeforeEach
+	public void setUpBeforeClass() throws Exception {
 		scheduler = new Scheduler();
 	}
 
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@AfterAll
-	public static void tearDown() throws Exception {
+	@AfterEach
+	public void tearDown() throws Exception {
 		scheduler.closeSockets();
 	}
 
@@ -73,6 +75,28 @@ class SchedulerTest {
 	
 	@Test 
 	public void testAddElevatorRequestPacket() {
+		addElevatorRequestPackets();
+		assertNotNull(scheduler.getElevatorRequestPackets());
+		assertEquals(3, scheduler.getElevatorRequestPackets().size());
+	}
+	
+	@Test 
+	public void testGetClosestElevator() {
+		addElevatorRequestPackets();
+		DatagramPacket closestPacket = scheduler.getClosestElevator(2);
+		int elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength());
+		assertEquals(1, elevatorFloorNum);
+		
+		DatagramPacket closestPacket2 = scheduler.getClosestElevator(5);
+		int elevatorFloorNum2 = (Integer) UDPUtil.convertFromBytes(closestPacket2.getData(), closestPacket2.getLength());
+		assertEquals(4, elevatorFloorNum2);
+		
+		DatagramPacket closestPacket3 = scheduler.getClosestElevator(6);
+		int elevatorFloorNum3 = (Integer) UDPUtil.convertFromBytes(closestPacket3.getData(), closestPacket3.getLength());
+		assertEquals(7, elevatorFloorNum3);
+	}
+	
+	private void addElevatorRequestPackets() {
 		byte[] data = UDPUtil.convertToBytes(7);
 		DatagramPacket testPacket = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 		
@@ -85,23 +109,5 @@ class SchedulerTest {
 		scheduler.addElevatorRequestPacket(testPacket);
 		scheduler.addElevatorRequestPacket(testPacket2);
 		scheduler.addElevatorRequestPacket(testPacket3);
-		
-		assertNotNull(scheduler.getElevatorRequestPackets());
-		assertEquals(3, scheduler.getElevatorRequestPackets().size());
-	}
-	
-	@Test 
-	public void testGetClosestElevator() {
-		DatagramPacket closestPacket = scheduler.getClosestElevator(2);
-		int elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength());
-		assertEquals(1, elevatorFloorNum);
-		
-		DatagramPacket closestPacket2 = scheduler.getClosestElevator(5);
-		int elevatorFloorNum2 = (Integer) UDPUtil.convertFromBytes(closestPacket2.getData(), closestPacket2.getLength());
-		assertEquals(4, elevatorFloorNum2);
-		
-		DatagramPacket closestPacket3 = scheduler.getClosestElevator(6);
-		int elevatorFloorNum3 = (Integer) UDPUtil.convertFromBytes(closestPacket3.getData(), closestPacket3.getLength());
-		assertEquals(7, elevatorFloorNum3);
 	}
 }

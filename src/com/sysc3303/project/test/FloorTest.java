@@ -18,13 +18,14 @@ import com.sysc3303.project.Scheduler;
  */
 class FloorTest {
 	private static Floor floor;
+	private static final boolean SHOULD_SLEEP = false;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		floor = new Floor();
+		floor = new Floor(SHOULD_SLEEP);
 	}
 	
 	@AfterAll

@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author Group 9
  */
 public class Elevator implements Runnable {
-	private ElevatorState state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
+	private ElevatorState state;
 	private int currentFloor = Floor.BOTTOM_FLOOR;
 	public static final int NUM_CARS = 3;
 	private final DatagramSocket socket;
@@ -24,7 +24,17 @@ public class Elevator implements Runnable {
 	 * Constructor for Elevator object.
 	 */
 	public Elevator() {
+		this(true);
+	}
+	
+	/**
+	 * Constructor for Elevator that stops thread from sleeping.
+	 * 
+	 * @param shouldSleep a flag which indicates if the thread should sleep between events or not
+	 */
+	public Elevator(boolean shouldSleep) {
 		socket = UDPUtil.createDatagramSocket();
+		state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString(), shouldSleep);
 	}
 	
 	/**

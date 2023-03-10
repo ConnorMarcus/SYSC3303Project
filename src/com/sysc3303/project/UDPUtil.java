@@ -23,6 +23,7 @@ import java.util.Arrays;
  */
 public class UDPUtil {
 	public static final int RECEIVE_PACKET_LENGTH = 2048;
+	private static final boolean DEBUG_SEND_RECEIVE = false; //sets whether the stack trace for sending/receiving packets will be printed
 	
 	/**
 	 * @return a new datagram socket object that listens on an open port
@@ -62,6 +63,21 @@ public class UDPUtil {
 	}
 	
 	/**
+	 * Gets the InetAdress object corresponding to the given IP Address
+	 * 
+	 * @param ipAddress the IP Address of the machine
+	 * @return the corresponding InetAdress object
+	 */
+	public static InetAddress getAddress(String ipAddress) {
+		try {
+			return InetAddress.getByName(ipAddress);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
 	 * @param socket the socket to send the packet from
 	 * @param packet the packet to send
 	 */
@@ -69,7 +85,9 @@ public class UDPUtil {
 		try {
 			socket.send(packet);
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (DEBUG_SEND_RECEIVE) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -81,7 +99,9 @@ public class UDPUtil {
 		try {
 			socket.receive(packet);
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (DEBUG_SEND_RECEIVE) {
+				e.printStackTrace();
+			}
 		}
 	}
 

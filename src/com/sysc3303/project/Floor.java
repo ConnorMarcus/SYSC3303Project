@@ -22,13 +22,24 @@ public class Floor implements Runnable {
 	private final DatagramSocket receiveSocket, sendSocket;
 	private final Queue<ElevatorEvent> eventQueue = new ArrayDeque<>();
 	private final Queue<String> responseQueue = new ArrayDeque<>();
+	private boolean shouldSleep = true; //flag to set whether the threads should sleep or not
 
 	/**
 	 * A constructor for a FloorSubsystem
 	 */
 	public Floor() {
+		this(true);
+	}
+	
+	/**
+	 * A constructor that sets the shouldSleep flag
+	 * 
+	 * @param shouldSleep a flag indicating if the floor threads will sleep or not
+	 */
+	public Floor(boolean shouldSleep) {
 		receiveSocket = UDPUtil.createDatagramSocket(PORT);
 		sendSocket = UDPUtil.createDatagramSocket();
+		this.shouldSleep = shouldSleep;
 	}
 
 	/**
@@ -51,19 +62,20 @@ public class Floor implements Runnable {
 			previousTime = eventQueue.peek().getTime(); 
 			// Send events to scheduler
 			for (ElevatorEvent e : eventQueue) {
-				sendFloorRequest(new FloorRequest(e));
 				currentTime = e.getTime(); 
 				int milliseconds = previousTime.getTimeDifferenceInMS(currentTime);
 				try {
-					Thread.sleep(milliseconds);
+					if (shouldSleep)
+						Thread.sleep(milliseconds);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
+				sendFloorRequest(new FloorRequest(e));
 				previousTime = currentTime; 
 		
 			}
 			sendSocket.close();
-		});
+		}, "FloorThread-1");
 		
 		Thread receiveResponses = new Thread(() -> {
 			for (int i = 0; i < eventQueue.size(); i++) {
@@ -72,7 +84,7 @@ public class Floor implements Runnable {
 			}
 			sendEndOfRequestsNotice();
 			receiveSocket.close();
-		}, "FloorThread");
+		}, "FloorThread-2");
 
 		sendToScheduler.start();
 		receiveResponses.start();
@@ -107,7 +119,7 @@ public class Floor implements Runnable {
 	private void receiveResponse() {
 		DatagramPacket responsePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(receiveSocket, responsePacket);
-		System.out.println("Floor: Received response from Scheduler");
+		System.out.println(Thread.currentThread().getName() + ": Received packet from Scheduler");
 		String response = new String(responsePacket.getData(), 0, responsePacket.getLength());
 		addResponse(response);
 	}
@@ -121,7 +133,7 @@ public class Floor implements Runnable {
 		byte[] data = UDPUtil.convertToBytes(request);
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.FLOOR_REQUEST_PORT);
 		UDPUtil.sendPacket(sendSocket, packet);
-		System.out.println("Floor: Sent FloorRequest object to Scheduler");
+		System.out.println(Thread.currentThread().getName() + ": Sent packet to Scheduler containing " + request.getElevatorEvent().toString());
 	}
 
 	/**
