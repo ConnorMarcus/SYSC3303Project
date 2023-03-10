@@ -19,10 +19,10 @@ import java.util.Queue;
  *
  */
 public class Scheduler implements Runnable {
-	private final Queue<FloorRequest> events; //request queue
-	private final List<DatagramPacket> elevatorRequestPackets;
+	private final Queue<FloorRequest> events = new ArrayDeque<>(); //request queue
+	private final List<DatagramPacket> elevatorRequestPackets = new ArrayList<>();
 	private final Queue<ElevatorResponse> responses; // response queue
-	private SchedulerState state; //the state of the scheduler
+	private SchedulerState state = new SchedulerReceivingState(); //the state of the scheduler
 	public static final int FLOOR_REQUEST_PORT = 4999; //Port for floor subsystem to send requests to
 	public static final int ELEVATOR_REQUEST_PORT = 5555; //Port for elevators to send requests to
 	public static final int ELEVATOR_RESPONSE_PORT = 5556; //Port for elevator to send response objects to
@@ -33,10 +33,6 @@ public class Scheduler implements Runnable {
 	 * Constructor; initializes all attributes with default values
 	 */
 	public Scheduler() {
-		events = new ArrayDeque<>();
-		elevatorRequestPackets = new ArrayList<>();
-		responses = new ArrayDeque<>();
-		state = new SchedulerReceivingState();
 		elevatorRequestSocket = UDPUtil.createDatagramSocket(ELEVATOR_REQUEST_PORT);
 		responseSocket = UDPUtil.createDatagramSocket(ELEVATOR_RESPONSE_PORT);
 		floorRequestSocket = UDPUtil.createDatagramSocket(FLOOR_REQUEST_PORT);
