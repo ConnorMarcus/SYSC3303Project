@@ -17,11 +17,12 @@ class ElevatorStateTest {
     public static final String STOPPED_STRING = ElevatorEvent.Direction.STOPPED.toString() + STATE_STRING;
     public static final String UP_STRING = ElevatorEvent.Direction.UP.toString() + STATE_STRING;
     public static final String DOWN_STRING = ElevatorEvent.Direction.DOWN.toString() + STATE_STRING;
+    private static final boolean SHOULD_SLEEP = false;
 
     @BeforeAll
     public static void setUpBeforeClass() {
-        elevatorState = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
-        elevator = new Elevator();
+        elevatorState = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString(), SHOULD_SLEEP);
+        elevator = new Elevator(SHOULD_SLEEP);
     }
     
     @AfterAll
@@ -31,13 +32,13 @@ class ElevatorStateTest {
 
     @Test
     public void testInitialState() {
-        ElevatorState es = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
+        ElevatorState es = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString(), SHOULD_SLEEP);
         assertEquals(STOPPED_STRING, es.toString());
 
-        es = new ElevatorState(ElevatorEvent.Direction.UP.toString());
+        es = new ElevatorState(ElevatorEvent.Direction.UP.toString(), SHOULD_SLEEP);
         assertEquals(UP_STRING, es.toString());
 
-        es = new ElevatorState(ElevatorEvent.Direction.DOWN.toString());
+        es = new ElevatorState(ElevatorEvent.Direction.DOWN.toString(), SHOULD_SLEEP);
         assertEquals(DOWN_STRING, es.toString());
     }
 
@@ -60,7 +61,7 @@ class ElevatorStateTest {
     @Test
     public void testHandleReachedDestination() {
         // Stop from stopped
-        elevatorState = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString());
+        elevatorState = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString(), SHOULD_SLEEP);
         elevatorState.handleReachedDestination(elevator, 0);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
         // Stop from moving up to top floor

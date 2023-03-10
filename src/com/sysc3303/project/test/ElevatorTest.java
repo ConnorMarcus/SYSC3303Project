@@ -20,13 +20,14 @@ import java.util.concurrent.*;
  */
 class ElevatorTest {
 	private static Elevator elevator;
+	private static final boolean SHOULD_SLEEP = false;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {
-		elevator = new Elevator();
+		elevator = new Elevator(SHOULD_SLEEP);
 	}
 	
 	@AfterAll
