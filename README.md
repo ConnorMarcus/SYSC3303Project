@@ -18,12 +18,26 @@ The following is a brief description of the Java files contained within the proj
 - `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
 - The above classes all have an associated JUnit test file
 
-## Breakdown of Responsibilities 
+## Breakdown of Responsibilities for Iteration 3
 - **Connor**: UDPUtil.java, updated Scheduler, Elevator, and Floor
 - **Ilyes**: UML Class diagram, updated Scheduler and Floor
 - **Noah**: JUnit test cases, updated Scheduler, Elevator, and Floor
 - **Patrick**: Sequence diagram, updated Scheduler, Elevator, and Floor
 - **Vahid**: README, updated ElevatorState, ElevatorEvent, Floor, and Time
+
+## Breakdown of Responsabilities for Iteration 2
+- **Connor**: SchedulerReceivingState.java, SchedulerReceivingSendingState.java, sequence diagram
+- **Ilyes**: SchedulerState.java, refactoring, UML class diagram
+- **Noah**: ElevatorState.java, state diagram, README
+- **Patrick**: JUnit tests, refactoring, README
+- **Vahid**: ElevatorState.java, state diagram
+
+## Breakdown of Responsabilities for Iteration 1
+- **Connor**: Time.java, ElevatorResponse.java, FloorRequest.java and README.txt.
+- **Ilyes**: JUnit testing, refactoring and UML Class diagram.
+- **Noah**: Elevator.java, ElevatorEvent.java and README.txt
+- **Patrick**: Floor.java, refactoring and FloorRequest.java.
+- **Vahid**: Scheduler.java, Main.java and UML Sequence diagram.
 
 ## Usage 
 
