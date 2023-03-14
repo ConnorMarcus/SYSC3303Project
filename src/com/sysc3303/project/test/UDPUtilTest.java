@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import org.junit.jupiter.api.Test;
 import com.sysc3303.project.ElevatorEvent;
 import com.sysc3303.project.ElevatorEvent.Direction;
+import com.sysc3303.project.ElevatorEvent.Fault;
 import com.sysc3303.project.FloorRequest;
 import com.sysc3303.project.Time;
 import com.sysc3303.project.UDPUtil;
@@ -49,14 +50,14 @@ public class UDPUtilTest {
 	
 	@Test 
 	public void testConvertToBytes() {
-		ElevatorEvent event = new ElevatorEvent(new Time("14", "05", "15", "000"), 1, Direction.UP, 3);
+		ElevatorEvent event = new ElevatorEvent(new Time("14", "05", "15", "000"), 1, Direction.UP, 3, Fault.NO_FAULT);
 		FloorRequest testObject = new FloorRequest(event);
 		assertNotNull(UDPUtil.convertToBytes(testObject));
 	}
 	
 	@Test
 	public void testConvertFromBytes() {
-		ElevatorEvent event = new ElevatorEvent(new Time("14", "05", "15", "000"), 1, Direction.UP, 3);
+		ElevatorEvent event = new ElevatorEvent(new Time("14", "05", "15", "000"), 1, Direction.UP, 3, Fault.NO_FAULT);
 		FloorRequest testObject = new FloorRequest(event);
 		byte[] data =  UDPUtil.convertToBytes(testObject);
 		
@@ -67,7 +68,7 @@ public class UDPUtilTest {
 	
 	@Test
 	public void testConvertFromBytesWithLength() {
-		ElevatorEvent event = new ElevatorEvent(new Time("14", "05", "15", "000"), 1, Direction.UP, 3);
+		ElevatorEvent event = new ElevatorEvent(new Time("14", "05", "15", "000"), 1, Direction.UP, 3, Fault.NO_FAULT);
 		FloorRequest testObject = new FloorRequest(event);
 		byte[] data =  UDPUtil.convertToBytes(testObject);
 		

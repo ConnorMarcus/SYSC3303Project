@@ -11,6 +11,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 
 import com.sysc3303.project.*;
+import com.sysc3303.project.ElevatorEvent.Direction;
+import com.sysc3303.project.ElevatorEvent.Fault;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,9 +47,9 @@ class SchedulerTest {
 
 	@Test
 	public void testFloorRequest() {
-		FloorRequest floorRequest = new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4 ));
+		FloorRequest floorRequest = new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4, Fault.NO_FAULT));
 		scheduler.addFloorRequest(floorRequest);
-		assertEquals(floorRequest, scheduler.getNextRequest());
+		assertEquals(floorRequest, scheduler.getNextRequest().iterator().next());
 	}
 	
 	@Test
@@ -84,26 +87,26 @@ class SchedulerTest {
 	public void testGetClosestElevator() {
 		addElevatorRequestPackets();
 		DatagramPacket closestPacket = scheduler.getClosestElevator(2);
-		int elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength());
+		int elevatorFloorNum = ((ElevatorRequest) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength())).getFloor();
 		assertEquals(1, elevatorFloorNum);
 		
 		DatagramPacket closestPacket2 = scheduler.getClosestElevator(5);
-		int elevatorFloorNum2 = (Integer) UDPUtil.convertFromBytes(closestPacket2.getData(), closestPacket2.getLength());
+		int elevatorFloorNum2 = ((ElevatorRequest) UDPUtil.convertFromBytes(closestPacket2.getData(), closestPacket2.getLength())).getFloor();
 		assertEquals(4, elevatorFloorNum2);
 		
 		DatagramPacket closestPacket3 = scheduler.getClosestElevator(6);
-		int elevatorFloorNum3 = (Integer) UDPUtil.convertFromBytes(closestPacket3.getData(), closestPacket3.getLength());
+		int elevatorFloorNum3 = ((ElevatorRequest) UDPUtil.convertFromBytes(closestPacket3.getData(), closestPacket3.getLength())).getFloor();
 		assertEquals(7, elevatorFloorNum3);
 	}
 	
 	private void addElevatorRequestPackets() {
-		byte[] data = UDPUtil.convertToBytes(7);
+		byte[] data = UDPUtil.convertToBytes(new ElevatorRequest(7, Direction.STOPPED));
 		DatagramPacket testPacket = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 		
-		byte[] data2 = UDPUtil.convertToBytes(1);
+		byte[] data2 = UDPUtil.convertToBytes(new ElevatorRequest(1, Direction.STOPPED));
 		DatagramPacket testPacket2 = new DatagramPacket(data2, data2.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 		
-		byte[] data3 = UDPUtil.convertToBytes(4);
+		byte[] data3 = UDPUtil.convertToBytes(new ElevatorRequest(4, Direction.STOPPED));
 		DatagramPacket testPacket3 = new DatagramPacket(data3, data3.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 
 		scheduler.addElevatorRequestPacket(testPacket);

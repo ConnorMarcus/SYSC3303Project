@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
+import com.sysc3303.project.ElevatorEvent.Fault;
+
 /**
  * The Floor subsystem
  * 
@@ -170,8 +172,9 @@ public class Floor implements Runnable {
 				if (lineValues[2].equals("Down"))
 					elevatorDirection = ElevatorEvent.Direction.DOWN;
 				int elevatorButton = Integer.parseInt(lineValues[3]); //Read from input file all necessary info
+				int faultNum = Integer.parseInt(lineValues[4]);
 				ElevatorEvent elevatorEvent = new ElevatorEvent(elevatorTime, elevatorFloor, elevatorDirection,
-						elevatorButton); //Create new instance of ElevatorEvent with info read from file
+						elevatorButton, Fault.getFaultEnum(faultNum)); //Create new instance of ElevatorEvent with info read from file
 				eventQueue.add(elevatorEvent); //Add ElevatorEvent to Queue
 			}
 			br.close();

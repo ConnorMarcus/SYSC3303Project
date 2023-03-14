@@ -3,10 +3,11 @@
  */
 package com.sysc3303.project;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
+import java.util.Set;
+import com.sysc3303.project.ElevatorEvent.Direction;
 
 /**
  * Corresponds to elevators in the Elevator subsystem.
@@ -79,68 +80,86 @@ public class Elevator implements Runnable {
 	public void run() {
 		System.out.println(Thread.currentThread().getName() + ": elevator starting on floor " + currentFloor + " in state " + state.toString());
 		while (true) {
-			FloorRequest request = getNextFloorRequest(); // gets next request from scheduler to process
-			if (request.isEndOfRequests()) {
+			Set<FloorRequest> requests = getNextFloorRequest(); // gets next request from scheduler to process
+			FloorRequest request = requests.iterator().next();
+			if (requests.size() == 1 && request.isEndOfRequests()) {
 				exitElevatorSubsystem();
 			}
-			ElevatorEvent elevatorEvent = request.getElevatorEvent();
-			processElevatorEvent(elevatorEvent);
-			updateState(elevatorEvent.getDirection(), elevatorEvent.getCarButton());
-			System.out.println(Thread.currentThread().getName() + ": Button " + elevatorEvent.getCarButton() + " Light is OFF");
-			System.out.println(Thread.currentThread().getName() + ": people have exited from the elevator");
-			setResponseForScheduler(request); // send response to scheduler
+			processElevatorEvents(requests);
+			updateState(requests);
 		}
 	}
 
 	/**
-	 * @return the next FloorRequest object from the scheduler
+	 * @return the Set of FloorRequest objects sent from the scheduler
 	 */
-	private FloorRequest getNextFloorRequest() {
-		byte[] data = UDPUtil.convertToBytes(currentFloor);
+	private Set<FloorRequest> getNextFloorRequest() {
+		DatagramPacket receivePacket = sendAndReceiveRequest(currentFloor, Direction.STOPPED);
+		return (Set<FloorRequest>) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
+	}
+
+	/**
+	 * Sends an elebatorRequest and reccives a set of FLoorRequests from Scheduler.
+	 * 
+	 * @param floorNum The floor number of the elevator.
+	 * @param direction The direction of the elevator.
+	 * @return The receive packet sent by the scheduler.
+	 */
+	public DatagramPacket sendAndReceiveRequest(int floorNum, Direction direction) {
+		byte[] data = UDPUtil.convertToBytes(new ElevatorRequest(floorNum, direction));
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_REQUEST_PORT);
 		UDPUtil.sendPacket(socket, packet);
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(socket, receivePacket);
-		return (FloorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
+		return receivePacket;
 	}
 
 	/**
 	 * Helper method to process an ElevatorEvent from the scheduler
 	 * 
-	 * @param event The event currently being processed
+	 * @param events The Set of events currently being processed
 	 */
-	private void processElevatorEvent(ElevatorEvent event) {
+	private void processElevatorEvents(Set<FloorRequest> events) {
 
-		System.out.println(Thread.currentThread().getName() + ": received " + event.toString());
-		int eventFloorNumber = event.getFloorNumber();
+		for (FloorRequest f: events) {
+			System.out.println(Thread.currentThread().getName() + ": received " + f.getElevatorEvent().toString());
+		}
+
+		int eventFloorNumber = events.iterator().next().getElevatorEvent().getFloorNumber();
 		
 		//Move to the appropriate floor if the elevator is not already there
 		if (currentFloor != eventFloorNumber) {
 			ElevatorEvent.Direction direction = currentFloor < eventFloorNumber ? ElevatorEvent.Direction.UP : ElevatorEvent.Direction.DOWN;
-			updateState(direction, eventFloorNumber); //Handle state changes
+			state.goToFloor(this, direction, eventFloorNumber);
 		}
 		System.out.println(Thread.currentThread().getName() + ": people have entered into the elevator");
-		System.out.println(Thread.currentThread().getName() + ": Button " + event.getCarButton() + " Light is ON");
+		
+		for (FloorRequest f: events) {
+			System.out.println(Thread.currentThread().getName() + ": Button " + f.getElevatorEvent().getCarButton() + " Light is ON");
+		}
 	}
 	
 	/**
 	 * Helper method to update the state of the elevator.
 	 * 
-	 * @param direction the direction which the elevator is traveling in
-	 * @param floorNumber the floor number which the elevator is going to
+	 * @param requests the set of FloorRequests which the elevator is going to
 	 */
-	private void updateState(ElevatorEvent.Direction direction, int floorNumber) {
-		state.handleRequest(this, direction, floorNumber); // change state to reflect moving up/down
-		state.handleReachedDestination(this, floorNumber); // change state to reflect reaching destination and stopping
+	private void updateState(Set<FloorRequest> requests) {
+		state.handleRequest(this, requests); // change state to reflect moving up/down
 	}
 
 	/**
 	 * Helper method to set a response for the scheduler
 	 * 
-	 * @param request The request currently being processed
+	 * @param events The Set of ElevatorEvents to response with
 	 */
-	private void setResponseForScheduler(FloorRequest request) {
-		String responseMessage = request.getElevatorEvent().toString() + " has been processed successfully";
+	public void setResponseForScheduler(Set<ElevatorEvent> events) {
+		StringBuilder sb = new StringBuilder();
+		for (ElevatorEvent e: events) {
+			sb.append(e.toString() + " has been processed successfully").append("\n");
+		}
+		sb.setLength(sb.length() - 1);
+		String responseMessage = sb.toString();
 		ElevatorResponse response = new ElevatorResponse(responseMessage);
 		sendElevatorResponse(response);
 	}
@@ -166,6 +185,9 @@ public class Elevator implements Runnable {
 		}
 	}
 	
+	/**
+	 * exits the ElevatorSubsystem 
+	 */
 	private void exitElevatorSubsystem() {
 		closeElevatorSockets();
 		System.exit(0);

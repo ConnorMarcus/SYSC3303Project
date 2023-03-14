@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.sysc3303.project.ElevatorEvent;
+import com.sysc3303.project.ElevatorEvent.Fault;
 import com.sysc3303.project.Time;
 
 /**
@@ -23,7 +24,7 @@ class ElevatorEventTest {
 	 */
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		elevatorEvent = new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4);
+		elevatorEvent = new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4, Fault.NO_FAULT);
 	}
 
 	@Test
@@ -38,7 +39,7 @@ class ElevatorEventTest {
 	 */
 	@Test
 	void eventOccursBeforeTest() {
-		ElevatorEvent test = new ElevatorEvent(new Time("1", "1", "1", "2"), 3, ElevatorEvent.Direction.UP, 4);
+		ElevatorEvent test = new ElevatorEvent(new Time("1", "1", "1", "2"), 3, ElevatorEvent.Direction.UP, 4, Fault.NO_FAULT);
 		assertEquals(true, elevatorEvent.eventOccursBefore(test));
 	}
 	

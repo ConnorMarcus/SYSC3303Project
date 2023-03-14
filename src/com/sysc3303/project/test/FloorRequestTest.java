@@ -11,6 +11,7 @@ import com.sysc3303.project.FloorRequest;
 import com.sysc3303.project.Scheduler;
 import com.sysc3303.project.Time;
 import com.sysc3303.project.ElevatorEvent.Direction;
+import com.sysc3303.project.ElevatorEvent.Fault;
 
 /**
  * @author Group 9
@@ -18,7 +19,7 @@ import com.sysc3303.project.ElevatorEvent.Direction;
  */
 class FloorRequestTest {
 	private static FloorRequest floorRequest;
-	private static ElevatorEvent elevatorEvent = new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4 );
+	private static ElevatorEvent elevatorEvent = new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4, Fault.NO_FAULT);
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {

@@ -6,10 +6,16 @@ package com.sysc3303.project;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.channels.NonReadableChannelException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
+
+import com.sysc3303.project.ElevatorEvent.Direction;
 
 /**
  * The Scheduler class which schedules the elevators and enables communication
@@ -83,7 +89,6 @@ public class Scheduler implements Runnable {
 				sendResponseToFloor();
 			}
 		}, "SchedulerThread-5");
-		
 		//start scheduler threads
 		requestsFromFloor.start();
 		requestsFromElevator.start();
@@ -91,7 +96,7 @@ public class Scheduler implements Runnable {
 		responsesFromElevator.start();
 		sendToFloor.start();
 	}
-	
+
 	/**
 	 * Receives FloorRequest from Floor subsystem and adds it to the event queue
 	 */
@@ -137,25 +142,58 @@ public class Scheduler implements Runnable {
 	private void receiveRequestFromElevator() {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(elevatorRequestSocket, receivePacket);
-		addElevatorRequestPacket(receivePacket);
+		ElevatorRequest elevatorRequest = (ElevatorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
+		
+		if (elevatorRequest.getDirection() == Direction.STOPPED) {
+			addElevatorRequestPacket(receivePacket);
+		}
+		else {
+			checkAndSendRequestsOnFloor(receivePacket);
+		}
 	}
 	
+	/**
+	 * Checks for requests which an elevator can take and sends them. 
+	 * 
+	 * @param The receivePacket 
+	 */
+	private synchronized void checkAndSendRequestsOnFloor(DatagramPacket receivePacket) {
+		ElevatorRequest elevatorRequest = (ElevatorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
+		int floor = elevatorRequest.getFloor();
+		Direction direction = elevatorRequest.getDirection();
+		
+		Set<FloorRequest> eventsSet = new HashSet<>();
+		
+		for (FloorRequest f: new HashSet<>(events)) {
+			if (f.getElevatorEvent().getDirection() == direction && f.getElevatorEvent().getFloorNumber() == floor) {
+				eventsSet.add(f);
+				events.remove(f);
+			}
+		}
+		
+		byte[] data =  UDPUtil.convertToBytes(eventsSet);
+		DatagramPacket sendPacket = new DatagramPacket(data, data.length, receivePacket.getAddress(), receivePacket.getPort());
+		DatagramSocket socket = UDPUtil.createDatagramSocket();
+		UDPUtil.sendPacket(socket, sendPacket);
+		socket.close();
+	}
+
 	/**
 	 * Sends a floor request to an elevator
 	 */
 	private void sendRequestToElevator() {
-		FloorRequest request = getNextRequest();
-		sendRequestToElevator(request);
+		Set<FloorRequest> requests = getNextRequest();
+		sendRequestToElevator(requests);
 	}
 	
 	/**
-	 * Sends a floor request to an elevator
+	 * Sends a floor request to an elevator.
 	 * 
-	 * @param request The request to send to the elevator
+	 * @param The Set requests to send.
 	 */
-	private void sendRequestToElevator(FloorRequest request) {
-		byte[] data = UDPUtil.convertToBytes(request);
-		DatagramPacket requestPacket = getClosestElevator(request.getElevatorEvent().getFloorNumber());
+	private void sendRequestToElevator(Set<FloorRequest> requests) {
+		byte[] data = UDPUtil.convertToBytes(requests);
+		DatagramPacket requestPacket = getClosestElevator(requests.iterator().next().getElevatorEvent().getFloorNumber());
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, requestPacket.getAddress(), requestPacket.getPort());
 		DatagramSocket socket = UDPUtil.createDatagramSocket();
 		UDPUtil.sendPacket(socket, sendPacket);
@@ -197,9 +235,9 @@ public class Scheduler implements Runnable {
 	/**
 	 * Gets and removes the FloorRequest at the head of the queue
 	 * 
-	 * @return The next FloorRequest in the queue
+	 * @return The Set of FloorRequests
 	 */
-	public synchronized FloorRequest getNextRequest() {
+	public synchronized Set<FloorRequest> getNextRequest() {
 		while (events.isEmpty()) {
 			try {
 				wait(); // wait until a request is available
@@ -208,7 +246,19 @@ public class Scheduler implements Runnable {
 				System.exit(1);
 			}
 		}
-		return events.remove();
+		
+		Set<FloorRequest> eventsSet = new HashSet<>();
+		FloorRequest removedRequest = events.remove();
+		eventsSet.add(removedRequest);
+		
+		for (FloorRequest f: new HashSet<>(events)) {
+			if (f.getElevatorEvent().getDirection() == removedRequest.getElevatorEvent().getDirection() && f.getElevatorEvent().getFloorNumber() == removedRequest.getElevatorEvent().getFloorNumber()) {
+				eventsSet.add(f);
+				events.remove(f);
+			}
+		}
+		
+		return eventsSet;
 	}
 	
 	/**
@@ -229,12 +279,13 @@ public class Scheduler implements Runnable {
 		
 		int index = 0;
 		DatagramPacket closestPacket = elevatorRequestPackets.get(index);
-		int elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength()); 
+		ElevatorRequest elevatorRequest = (ElevatorRequest) UDPUtil.convertFromBytes(closestPacket.getData(), closestPacket.getLength());
+		int elevatorFloorNum = elevatorRequest.getFloor();
 		int closest = Math.abs(floorNum - elevatorFloorNum);
 		
 		for (int i = 1; i < elevatorRequestPackets.size(); i++) {
 			DatagramPacket packet = elevatorRequestPackets.get(i);
-			elevatorFloorNum = (Integer) UDPUtil.convertFromBytes(packet.getData(), packet.getLength());
+			elevatorFloorNum = ((ElevatorRequest) UDPUtil.convertFromBytes(packet.getData(), packet.getLength())).getFloor();
 			int difference = Math.abs(elevatorFloorNum - floorNum);
 			
 			if (difference < closest) {
@@ -312,7 +363,7 @@ public class Scheduler implements Runnable {
 	 */
 	private void shutDownScheduler(FloorRequest request) {
 		// Send message to elevator to shut down
-		sendRequestToElevator(request);
+		sendRequestToElevator(new HashSet<>(Arrays.asList(request)));
 		System.out.println("Scheduler notified Elevator subsystem of end of requests, shutting down");
 
 		closeSockets();
