@@ -37,15 +37,10 @@ public class ElevatorRequest implements Serializable {
 	/**
 	 * Gets the direction of the Elevator request.
 	 * 
-	 * @return The direction
+	 * @return The direction of the request.
 	 */
 	public Direction getDirection() {
 		return direction;
 	}
-	
-	
-	
- 	
-	
 	
 }

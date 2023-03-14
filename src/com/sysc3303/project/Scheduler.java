@@ -97,7 +97,6 @@ public class Scheduler implements Runnable {
 		sendToFloor.start();
 	}
 
-
 	/**
 	 * Receives FloorRequest from Floor subsystem and adds it to the event queue
 	 */
@@ -151,9 +150,13 @@ public class Scheduler implements Runnable {
 		else {
 			checkAndSendRequestsOnFloor(receivePacket);
 		}
-		
 	}
 	
+	/**
+	 * Checks for requests which an elevator can take and sends them. 
+	 * 
+	 * @param The receivePacket 
+	 */
 	private synchronized void checkAndSendRequestsOnFloor(DatagramPacket receivePacket) {
 		ElevatorRequest elevatorRequest = (ElevatorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 		int floor = elevatorRequest.getFloor();
@@ -184,9 +187,9 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * Sends a floor request to an elevator
+	 * Sends a floor request to an elevator.
 	 * 
-	 * @param request The request to send to the elevator
+	 * @param The Set requests to send.
 	 */
 	private void sendRequestToElevator(Set<FloorRequest> requests) {
 		byte[] data = UDPUtil.convertToBytes(requests);
@@ -232,7 +235,7 @@ public class Scheduler implements Runnable {
 	/**
 	 * Gets and removes the FloorRequest at the head of the queue
 	 * 
-	 * @return The next FloorRequest in the queue
+	 * @return The Set of FloorRequests
 	 */
 	public synchronized Set<FloorRequest> getNextRequest() {
 		while (events.isEmpty()) {
