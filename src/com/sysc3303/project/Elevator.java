@@ -119,22 +119,41 @@ public class Elevator implements Runnable {
 	 * 
 	 * @param events The Set of events currently being processed
 	 */
-	private void processElevatorEvents(Set<FloorRequest> events) {
+	private void processElevatorEvents(Set<FloorRequest> requests) {
 
-		for (FloorRequest f: events) {
-			System.out.println(Thread.currentThread().getName() + ": received " + f.getElevatorEvent().toString());
-		}
+		printReceivedRequests(requests);
 
-		int eventFloorNumber = events.iterator().next().getElevatorEvent().getFloorNumber();
+		int eventFloorNumber = requests.iterator().next().getElevatorEvent().getFloorNumber();
 		
 		//Move to the appropriate floor if the elevator is not already there
 		if (currentFloor != eventFloorNumber) {
 			ElevatorEvent.Direction direction = currentFloor < eventFloorNumber ? ElevatorEvent.Direction.UP : ElevatorEvent.Direction.DOWN;
 			state.goToFloor(this, direction, eventFloorNumber);
 		}
+		
+		printPeopleEntered(requests);
+	}
+	
+	/**
+	 * Prints out the new requests received by the elevator
+	 * 
+	 * @param requests The new requests received by the elevator
+	 */
+	public void printReceivedRequests(Set<FloorRequest> requests) {
+		for (FloorRequest f: requests) {
+			System.out.println(Thread.currentThread().getName() + ": received " + f.getElevatorEvent().toString());
+		}
+	}
+	
+	/**
+	 * Prints that people have entered the elevator and the buttons they have pressed
+	 * 
+	 * @param requests The requests corresponding to the people entering
+	 */
+	public void printPeopleEntered(Set<FloorRequest> requests) {
 		System.out.println(Thread.currentThread().getName() + ": people have entered into the elevator");
 		
-		for (FloorRequest f: events) {
+		for (FloorRequest f: requests) {
 			System.out.println(Thread.currentThread().getName() + ": Button " + f.getElevatorEvent().getCarButton() + " Light is ON");
 		}
 	}

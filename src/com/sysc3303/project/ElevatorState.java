@@ -61,7 +61,7 @@ public class ElevatorState {
 	 * @param requests the Set of FLoorRequests
 	 */
 	public void handleRequest(Elevator elevator, Set<FloorRequest> requests) {
-		System.out.println(Thread.currentThread().getName() + ": elevator doors closing");
+		closeDoors();
 		Direction direction = requests.iterator().next().getElevatorEvent().getDirection();
 		setNewState(elevator, direction.toString());
 		moveBetweenFloors(elevator, requests);
@@ -75,7 +75,7 @@ public class ElevatorState {
 	 * @param requestedFloor the requested floor.
 	 */
 	public void goToFloor(Elevator elevator, ElevatorEvent.Direction direction, int requestedFloor) {
-		System.out.println(Thread.currentThread().getName() + ": elevator doors closing");
+		closeDoors();
 		setNewState(elevator, direction.toString());
 		if (shouldSleep)
 			sleepWhileMoving(Math.abs(requestedFloor - elevator.getCurrentFloor()));
@@ -125,24 +125,38 @@ public class ElevatorState {
 
 			DatagramPacket receivePacket = elevator.sendAndReceiveRequest(nextFloor, direction);
 			Set<FloorRequest> newRequests = (Set<FloorRequest>) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
-			requests.addAll(newRequests);
-
+			
+			
 			for (FloorRequest f : new HashSet<>(requests)) {
 				if (f.getElevatorEvent().getCarButton() == nextFloor) {
 					events.add(f.getElevatorEvent());
 					requests.remove(f);
 				}
 			}
+			
+			boolean peopleExitedOnFloor = !events.isEmpty();
 
-			if (!events.isEmpty()) {
+			if (peopleExitedOnFloor) {
 				handleReachedDestination(elevator, events.iterator().next().getCarButton(), true);
 				elevator.setResponseForScheduler(events);
-
-				if (!requests.isEmpty()) {
-					setNewState(elevator, direction.toString());
-				}
 			}
 			
+			if (!newRequests.isEmpty()) { 
+				requests.addAll(newRequests); //adds new people entering into elevator
+				elevator.printReceivedRequests(newRequests);
+				
+				//Elevator has to stop at floor if not already stopped
+				if(!peopleExitedOnFloor)
+					handleReachedDestination(elevator, nextFloor, false);
+				
+				elevator.printPeopleEntered(newRequests);
+			}
+		
+			//continue moving if there are still more requests to serve
+			if (!requests.isEmpty() && elevator.getState().getDirection() != direction) {
+				closeDoors();
+				setNewState(elevator, direction.toString());
+			}
 		}
 	}
 
@@ -182,6 +196,13 @@ public class ElevatorState {
 	private void setNewState(Elevator elevator, String name) {
 		elevator.setState(new ElevatorState(name));
 		System.out.println(Thread.currentThread().getName() + ": elevator currently in state " + elevator.getState());
+	}
+	
+	/**
+	 * Closes the Elevator's doors
+	 */
+	private void closeDoors() {
+		System.out.println(Thread.currentThread().getName() + ": elevator doors closing");
 	}
 
 	/**
