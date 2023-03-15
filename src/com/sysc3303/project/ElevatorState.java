@@ -68,7 +68,7 @@ public class ElevatorState {
 	}
 
 	/**
-	 * Moves an elevatpr to a floor.
+	 * Moves an elevator to a floor.
 	 * 
 	 * @param elevator       the elevator object.
 	 * @param direction      the direction of the elevator.
@@ -124,8 +124,7 @@ public class ElevatorState {
 			Set<ElevatorEvent> events = new HashSet<>();
 
 			DatagramPacket receivePacket = elevator.sendAndReceiveRequest(nextFloor, direction);
-			Set<FloorRequest> newRequests = (Set<FloorRequest>) UDPUtil.convertFromBytes(receivePacket.getData(),
-					receivePacket.getLength());
+			Set<FloorRequest> newRequests = (Set<FloorRequest>) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 			requests.addAll(newRequests);
 
 			for (FloorRequest f : new HashSet<>(requests)) {
@@ -143,7 +142,7 @@ public class ElevatorState {
 					setNewState(elevator, direction.toString());
 				}
 			}
-
+			
 		}
 	}
 
@@ -157,8 +156,7 @@ public class ElevatorState {
 	 */
 	public void handleReachedDestination(Elevator elevator, int floorNum, boolean peopleExiting) {
 		try {
-			System.out.println(
-					Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
+			System.out.println(Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
 			setNewState(elevator, ElevatorEvent.Direction.STOPPED.toString());
 			if (shouldSleep)
 				Thread.sleep(TIME_REACH_FLOOR_BEFORE_DOORS_OPEN);
