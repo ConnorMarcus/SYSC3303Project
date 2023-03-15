@@ -86,7 +86,7 @@ public class Elevator implements Runnable {
 				exitElevatorSubsystem();
 			}
 			processElevatorEvents(requests);
-			updateState(requests);
+			state.handleRequest(this, requests);
 		}
 	}
 
@@ -139,14 +139,6 @@ public class Elevator implements Runnable {
 		}
 	}
 	
-	/**
-	 * Helper method to update the state of the elevator.
-	 * 
-	 * @param requests the set of FloorRequests which the elevator is going to
-	 */
-	private void updateState(Set<FloorRequest> requests) {
-		state.handleRequest(this, requests); // change state to reflect moving up/down
-	}
 
 	/**
 	 * Helper method to set a response for the scheduler

@@ -139,7 +139,7 @@ public class Scheduler implements Runnable {
 	/**
 	 * Receives a request from an elevator 
 	 */
-	private void receiveRequestFromElevator() {
+	public void receiveRequestFromElevator() {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(elevatorRequestSocket, receivePacket);
 		ElevatorRequest elevatorRequest = (ElevatorRequest) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());

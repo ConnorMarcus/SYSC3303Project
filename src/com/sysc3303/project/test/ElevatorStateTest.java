@@ -3,13 +3,9 @@ package com.sysc3303.project.test;
 import com.sysc3303.project.*;
 import com.sysc3303.project.ElevatorEvent.Direction;
 import com.sysc3303.project.ElevatorEvent.Fault;
-
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,51 +47,71 @@ class ElevatorStateTest {
 
     @Test
     public void testHandleRequest() {
-        // Elevator object's initial state is STOPPED
-    	Set<FloorRequest> test = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 5, Direction.DOWN, 1, Fault.NO_FAULT)))); 
+    	Scheduler scheduler = new Scheduler(); //need a scheduler for this test to respond to elevator requests
+    	
+    	//Test inputs
+    	final int TEST1_FROM = 1;
+    	final int TEST1_TO = 5;
+    	final int TEST2_FROM = 5;
+    	final int TEST2_TO = 3;
+    	final int TEST3_FROM = 3;
+    	final int TEST3_TO = 4;
+    	final int TEST4_FROM = 4;
+    	final int TEST4_TO = 1;
+    	
+    	//Need a thread for the scheduler
+    	Thread schedulerTestThread = new Thread(() -> {
+    		int numLoops = Math.abs(TEST1_FROM - TEST1_TO) + Math.abs(TEST2_FROM - TEST2_TO) + Math.abs(TEST3_FROM - TEST3_TO) + Math.abs(TEST4_FROM - TEST4_TO);
+    		for (int i=0; i < numLoops; i++) {
+    			scheduler.receiveRequestFromElevator();
+    		}
+    		
+    	});
+		schedulerTestThread.start();
+    	
+        // test moving from floor 1 to 5
+    	Set<FloorRequest> test = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), TEST1_FROM, Direction.UP, TEST1_TO, Fault.NO_FAULT)))); 
         elevatorState.handleRequest(elevator, test);
-        assertEquals(DOWN_STRING, elevator.getState().toString());
-        // Try going down from down state
-    	Set<FloorRequest> test2 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 3, Direction.DOWN, 1, Fault.NO_FAULT)))); 
+        assertEquals(STOPPED_STRING, elevator.getState().toString());
+        assertEquals(5, elevator.getCurrentFloor());
+       
+        // test moving from floor 5 to 3
+    	Set<FloorRequest> test2 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), TEST2_FROM, Direction.DOWN, TEST2_TO, Fault.NO_FAULT)))); 
         elevatorState.handleRequest(elevator, test2);
-        assertEquals(DOWN_STRING, elevator.getState().toString());
+        assertEquals(STOPPED_STRING, elevator.getState().toString());
+        assertEquals(3, elevator.getCurrentFloor());
 
-    	Set<FloorRequest> test3 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 1, Direction.UP, 4, Fault.NO_FAULT)))); 
+        // test moving from floor 3 to 4
+    	Set<FloorRequest> test3 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), TEST3_FROM, Direction.UP, TEST3_TO, Fault.NO_FAULT)))); 
         elevatorState.handleRequest(elevator, test3);
-        assertEquals(UP_STRING, elevator.getState().toString());
+        assertEquals(STOPPED_STRING, elevator.getState().toString());
+        assertEquals(4, elevator.getCurrentFloor());
         
-        // Try going up from up state
-    	Set<FloorRequest> test4 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 4, Direction.UP, 5, Fault.NO_FAULT)))); 
+        // test moving from floor 4 to 1
+    	Set<FloorRequest> test4 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), TEST4_FROM, Direction.DOWN, TEST4_TO, Fault.NO_FAULT)))); 
         elevatorState.handleRequest(elevator, test4);
-        assertEquals(UP_STRING, elevator.getState().toString());
+        assertEquals(STOPPED_STRING, elevator.getState().toString());
+        assertEquals(1, elevator.getCurrentFloor());
+        
+        scheduler.closeSockets();
+    }
+    
+    @Test
+    public void testGoToFloor() {
+        //test going up
+    	elevatorState.goToFloor(elevator, Direction.UP, 3);
+        assertEquals(3, elevator.getCurrentFloor());
+        
+        //test going down
+        elevatorState.goToFloor(elevator, Direction.DOWN, 1);
+        assertEquals(1, elevator.getCurrentFloor());
     }
 
     @Test
     public void testHandleReachedDestination() {
-        // Stop from stopped
-    	
-        elevatorState = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString(), SHOULD_SLEEP);
-        elevatorState.handleReachedDestination(elevator, 0, false);
-        assertEquals(STOPPED_STRING, elevator.getState().toString());
-        // Stop from moving up to top floor
-        Set<FloorRequest> test = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 1, Direction.UP, 2, Fault.NO_FAULT)))); 
-        elevatorState.handleRequest(elevator, test);
-        elevatorState.handleReachedDestination(elevator, Floor.NUM_FLOORS, false);
-        assertEquals(STOPPED_STRING, elevator.getState().toString());
-        // Stop from moving up to bottom floor somehow
-        Set<FloorRequest> test2 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 3, Direction.UP, 4, Fault.NO_FAULT)))); 
-        elevatorState.handleRequest(elevator, test2);
-        elevatorState.handleReachedDestination(elevator, Floor.BOTTOM_FLOOR, false);
-        assertEquals(STOPPED_STRING, elevator.getState().toString());
-        // Stop from moving down to bottom floor
-        Set<FloorRequest> test3 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 4, Direction.DOWN, 2, Fault.NO_FAULT)))); 
-        elevatorState.handleRequest(elevator, test3);
-        elevatorState.handleReachedDestination(elevator, Floor.BOTTOM_FLOOR, false);
-        assertEquals(STOPPED_STRING, elevator.getState().toString());
-        // Stop from moving down to top floor somehow
-        Set<FloorRequest> test4 = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 3, Direction.DOWN, 1, Fault.NO_FAULT)))); 
-        elevatorState.handleRequest(elevator, test4);
-        elevatorState.handleReachedDestination(elevator, Floor.NUM_FLOORS, false);
+        // Test to make sure elevator state moves into "stopped state"
+        elevator.setState(new ElevatorState(UP_STRING));
+        elevatorState.handleReachedDestination(elevator, 2, false);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
     }
 }
