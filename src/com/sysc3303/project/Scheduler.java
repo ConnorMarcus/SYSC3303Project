@@ -6,7 +6,6 @@ package com.sysc3303.project;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.nio.channels.NonReadableChannelException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -233,12 +232,13 @@ public class Scheduler implements Runnable {
 	}
 	
 	/**
-	 * Gets and removes the FloorRequest at the head of the queue
+	 * Gets and removes the FloorRequest at the head of the queue as well as any
+	 * other FloorRequest objects on the same floor and going in the same direction
 	 * 
 	 * @return The Set of FloorRequests
 	 */
-	public synchronized Set<FloorRequest> getNextRequest() {
-		while (events.isEmpty()) {
+	private synchronized Set<FloorRequest> getNextRequest() {
+		while (events.isEmpty() || elevatorRequestPackets.isEmpty()) {
 			try {
 				wait(); // wait until a request is available
 			} catch (InterruptedException e) {
@@ -259,6 +259,13 @@ public class Scheduler implements Runnable {
 		}
 		
 		return eventsSet;
+	}
+	
+	/**
+	 * @return The FloorRequest at the head of the queue
+	 */
+	public synchronized FloorRequest peekRequestAtFront() {
+		return events.peek();
 	}
 	
 	/**

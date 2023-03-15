@@ -49,7 +49,7 @@ class SchedulerTest {
 	public void testFloorRequest() {
 		FloorRequest floorRequest = new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), 3, ElevatorEvent.Direction.UP, 4, Fault.NO_FAULT));
 		scheduler.addFloorRequest(floorRequest);
-		assertEquals(floorRequest, scheduler.getNextRequest().iterator().next());
+		assertEquals(floorRequest, scheduler.peekRequestAtFront());
 	}
 	
 	@Test
