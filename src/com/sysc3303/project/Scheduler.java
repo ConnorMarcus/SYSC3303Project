@@ -109,6 +109,7 @@ public class Scheduler implements Runnable {
 		}
 		
 		addFloorRequest(request);
+		sendAcknowledgmentPacket(Floor.ADDRESS, Floor.ACKNOWLEDGEMENT_PORT, true);
 	}
 	
 	/**
@@ -132,7 +133,7 @@ public class Scheduler implements Runnable {
 		UDPUtil.receivePacket(responseSocket, receivePacket);
 		ElevatorResponse response = (ElevatorResponse) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 		addElevatorResponse(response);
-		
+		sendAcknowledgmentPacket(ADDRESS, receivePacket.getPort(), false);
 	}
 	
 	/**
@@ -196,6 +197,24 @@ public class Scheduler implements Runnable {
 		DatagramPacket sendPacket = new DatagramPacket(data, data.length, requestPacket.getAddress(), requestPacket.getPort());
 		DatagramSocket socket = UDPUtil.createDatagramSocket();
 		UDPUtil.sendPacket(socket, sendPacket);
+		socket.close();
+	}
+	
+	/**
+	 * Creates an acknowledgement DatagramPacket and sends it to the specified socket
+	 * 
+	 * @param address InetAddress to send acknowledgement packet to
+	 * @param port	Int port number to send acknowledgement packet to
+	 * @param toFloor	boolean true if sending acknowledgement to Floor, else to Elevator
+	 */
+	private void sendAcknowledgmentPacket(InetAddress address, int port, boolean toFloor) {
+		String destination = (toFloor) ? "Floor" : "Elevator";		
+		System.out.println(Thread.currentThread().getName() + ": Sending acknowledgment packet to " + destination);
+		String message = "REQUEST_ACKNOWLEDGED"; 
+		byte[] data = message.getBytes();  
+		DatagramPacket acknowledgmentPacket = new DatagramPacket(data, data.length, address, port);
+		DatagramSocket socket = UDPUtil.createDatagramSocket(); 
+		UDPUtil.sendPacket(socket, acknowledgmentPacket);
 		socket.close();
 	}
 	

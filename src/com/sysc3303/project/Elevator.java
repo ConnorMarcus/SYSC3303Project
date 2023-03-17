@@ -99,7 +99,7 @@ public class Elevator implements Runnable {
 	}
 
 	/**
-	 * Sends an elebatorRequest and reccives a set of FLoorRequests from Scheduler.
+	 * Sends an ElevatorRequest and receives a set of FloorRequests from Scheduler.
 	 * 
 	 * @param floorNum The floor number of the elevator.
 	 * @param direction The direction of the elevator.
@@ -176,7 +176,7 @@ public class Elevator implements Runnable {
 	}
 	
 	/**
-	 * Adds elevator response object to scheduler's response queue
+	 * Adds ElevatorResponse to scheduler's response queue
 	 * 
 	 * @param response the response object to send to the scheduler
 	 */
@@ -184,6 +184,17 @@ public class Elevator implements Runnable {
 		byte[] data = UDPUtil.convertToBytes(response);
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_RESPONSE_PORT);
 		UDPUtil.sendPacket(socket, packet);
+		receiveAcknowledgment(); //Receives acknowledgment pack from the scheduler
+	}
+	
+	/**
+	 * Receives an acknowledgement packet from the scheduler
+	 */
+	private void receiveAcknowledgment() {
+		DatagramPacket acknowledgementPacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
+		UDPUtil.receivePacket(socket, acknowledgementPacket);
+		System.out.print(Thread.currentThread().getName() + ": Received acknowledgment packet from Scheduler containing "
+				+ new String(acknowledgementPacket.getData(), 0, acknowledgementPacket.getLength()) + "\n");
 	}
 
 	/**
