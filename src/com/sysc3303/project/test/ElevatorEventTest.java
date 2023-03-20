@@ -45,7 +45,7 @@ class ElevatorEventTest {
 	
 	@Test
 	void toStringTest() {
-		assertEquals("ElevatorEvent[Time: 1:1:1.1, Floor: 3, Floor Button: UP, Car Button: 4]", elevatorEvent.toString());
+		assertEquals("ElevatorEvent[Time: 1:1:1.1, Floor: 3, Floor Button: UP, Car Button: 4, NO_FAULT]", elevatorEvent.toString());
 	}
 
 }

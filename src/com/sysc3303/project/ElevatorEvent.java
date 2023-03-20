@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package com.sysc3303.project;
 
 import java.io.Serializable;
@@ -123,7 +121,14 @@ public class ElevatorEvent implements Serializable {
 		return new ElevatorEvent(null, 0, null, 0, Fault.SHUTDOWN);
 	}
 
-
+	/**
+	 * Gets the fault enum of the ElevatorEvent.
+	 * @return the fault enum of the ElevatorEvent
+	 */
+	public Fault getFault() {
+		return fault;
+	}
+	
 	/** Checks if an ElevatorEvent signifies that all requests have been sent
 	 * @return true if the event is a valid final event, and false otherwise
 	 */
@@ -136,8 +141,8 @@ public class ElevatorEvent implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return String.format("ElevatorEvent[Time: %s, Floor: %s, Floor Button: %s, Car Button: %s]", time.toString(),
-				floorNumber, direction, carButtonNumber);
+		return String.format("ElevatorEvent[Time: %s, Floor: %s, Floor Button: %s, Car Button: %s, %s]", time.toString(),
+				floorNumber, direction, carButtonNumber, fault);
 	}
 
 }
