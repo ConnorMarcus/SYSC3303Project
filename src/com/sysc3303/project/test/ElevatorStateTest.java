@@ -4,6 +4,7 @@ import com.sysc3303.project.*;
 import com.sysc3303.project.ElevatorEvent.Direction;
 import com.sysc3303.project.ElevatorEvent.Fault;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 
 class ElevatorStateTest {
 
@@ -22,14 +24,14 @@ class ElevatorStateTest {
     public static final String DOWN_STRING = ElevatorEvent.Direction.DOWN.toString() + STATE_STRING;
     private static final boolean SHOULD_SLEEP = false;
 
-    @BeforeAll
-    public static void setUpBeforeClass() {
-        elevatorState = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString(), SHOULD_SLEEP);
+    @BeforeEach
+    public void setUpBeforeClass() {
         elevator = new Elevator(SHOULD_SLEEP);
+        elevatorState = elevator.getState();
     }
     
-    @AfterAll
-    public static void tearDown() {
+    @AfterEach
+    public void tearDown() {
     	elevator.closeSocket();
     }
 
@@ -50,7 +52,7 @@ class ElevatorStateTest {
     	Scheduler scheduler = new Scheduler(); //need a scheduler for this test to respond to elevator requests
     	
     	//Test inputs
-    	final int TEST1_FROM = 1;
+    	final int TEST1_FROM = Floor.BOTTOM_FLOOR;
     	final int TEST1_TO = 5;
     	final int TEST2_FROM = 5;
     	final int TEST2_TO = 3;
@@ -58,16 +60,26 @@ class ElevatorStateTest {
     	final int TEST3_TO = 4;
     	final int TEST4_FROM = 4;
     	final int TEST4_TO = 1;
+    	final int NUM_TESTS = 4;
     	
-    	//Need a thread for the scheduler
-    	Thread schedulerTestThread = new Thread(() -> {
+    	//Need a thread for the scheduler to receive requests
+    	Thread schedulerTestThread1 = new Thread(() -> {
     		int numLoops = Math.abs(TEST1_FROM - TEST1_TO) + Math.abs(TEST2_FROM - TEST2_TO) + Math.abs(TEST3_FROM - TEST3_TO) + Math.abs(TEST4_FROM - TEST4_TO);
     		for (int i=0; i < numLoops; i++) {
     			scheduler.receiveRequestFromElevator();
     		}
-    		
     	});
-		schedulerTestThread.start();
+    	
+    	//Need a thread for the scheduler to send acknowledgements
+    	Thread schedulerTestThread2 = new Thread(() -> {
+    		int numLoops = NUM_TESTS;
+    		for (int i=0; i < numLoops; i++) {
+    			scheduler.receiveResponseFromElevator();
+    		}
+    	});
+    	
+		schedulerTestThread1.start();
+		schedulerTestThread2.start();
     	
         // test moving from floor 1 to 5
     	Set<FloorRequest> test = new HashSet<>(Arrays.asList(new FloorRequest(new ElevatorEvent(new Time("1", "1", "1", "1"), TEST1_FROM, Direction.UP, TEST1_TO, Fault.NO_FAULT)))); 
@@ -110,7 +122,7 @@ class ElevatorStateTest {
     @Test
     public void testHandleReachedDestination() {
         // Test to make sure elevator state moves into "stopped state"
-        elevator.setState(new ElevatorState(UP_STRING));
+        elevatorState.goToFloor(elevator, Direction.UP, 2);
         elevatorState.handleReachedDestination(elevator, 2, false);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
     }

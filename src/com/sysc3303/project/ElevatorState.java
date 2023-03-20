@@ -153,7 +153,7 @@ public class ElevatorState {
 			}
 		
 			//continue moving if there are still more requests to serve
-			if (!requests.isEmpty() && elevator.getState().getDirection() != direction) {
+			if (!requests.isEmpty() && this.getDirection() != direction) {
 				closeDoors();
 				setNewState(elevator, direction.toString());
 			}
@@ -194,7 +194,7 @@ public class ElevatorState {
 	 * @param name     the name of the state to transition the elevator to
 	 */
 	private void setNewState(Elevator elevator, String name) {
-		elevator.setState(new ElevatorState(name));
+		this.stateName = name;
 		System.out.println(Thread.currentThread().getName() + ": elevator currently in state " + elevator.getState());
 	}
 	
