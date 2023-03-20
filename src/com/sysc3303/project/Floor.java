@@ -19,10 +19,9 @@ public class Floor implements Runnable {
 	public static final int NUM_FLOORS = 5;
 	public static final int BOTTOM_FLOOR = 1;
 	public static final int PORT = 5552;
-	public static final int ACKNOWLEDGEMENT_PORT = 6969;
 	public static final InetAddress ADDRESS = UDPUtil.getLocalHost();
 	private static final String INPUT_FILE_PATH = "Resources/floor_input.txt";
-	private final DatagramSocket receiveSocket, sendSocket, receiveAckSocket;
+	private final DatagramSocket receiveSocket, sendSocket;
 	private final Queue<ElevatorEvent> eventQueue = new ArrayDeque<>();
 	private final Queue<String> responseQueue = new ArrayDeque<>();
 	private boolean shouldSleep = true; //flag to set whether the threads should sleep or not
@@ -42,7 +41,6 @@ public class Floor implements Runnable {
 	public Floor(boolean shouldSleep) {
 		receiveSocket = UDPUtil.createDatagramSocket(PORT);
 		sendSocket = UDPUtil.createDatagramSocket();
-		receiveAckSocket = UDPUtil.createDatagramSocket(ACKNOWLEDGEMENT_PORT);
 		this.shouldSleep = shouldSleep;
 	}
 
@@ -135,7 +133,7 @@ public class Floor implements Runnable {
 	 */
 	private void receiveAcknowledgment() {
 		DatagramPacket acknowledgementPacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
-		UDPUtil.receivePacket(receiveAckSocket, acknowledgementPacket);
+		UDPUtil.receivePacket(sendSocket, acknowledgementPacket);
 		System.out.print(Thread.currentThread().getName() + ": Received acknowledgment packet from Scheduler containing "
 				+ new String(acknowledgementPacket.getData(), 0, acknowledgementPacket.getLength()) + "\n");
 	}

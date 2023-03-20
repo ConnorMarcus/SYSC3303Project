@@ -109,7 +109,7 @@ public class Scheduler implements Runnable {
 		}
 		
 		addFloorRequest(request);
-		sendAcknowledgmentPacket(Floor.ADDRESS, Floor.ACKNOWLEDGEMENT_PORT, true);
+		sendAcknowledgmentPacket(receivePacket.getAddress(), receivePacket.getPort(), true);
 	}
 	
 	/**
@@ -128,12 +128,12 @@ public class Scheduler implements Runnable {
 	/**
 	 * Receives a response object from an elevator and adds it to the response queue
 	 */
-	private void receiveResponseFromElevator() {
+	public void receiveResponseFromElevator() {
 		DatagramPacket receivePacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(responseSocket, receivePacket);
 		ElevatorResponse response = (ElevatorResponse) UDPUtil.convertFromBytes(receivePacket.getData(), receivePacket.getLength());
 		addElevatorResponse(response);
-		sendAcknowledgmentPacket(ADDRESS, receivePacket.getPort(), false);
+		sendAcknowledgmentPacket(receivePacket.getAddress(), receivePacket.getPort(), false);
 	}
 	
 	/**
