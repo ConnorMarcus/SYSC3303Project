@@ -7,7 +7,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.sysc3303.project.ElevatorEvent.Direction;
+import com.sysc3303.project.ElevatorEvent.Fault;
 
 /**
  * Corresponds to elevators in the Elevator subsystem.
@@ -20,6 +23,8 @@ public class Elevator implements Runnable {
 	public static final int NUM_CARS = 3;
 	private final DatagramSocket socket;
 	private static ArrayList<Elevator> elevators = new ArrayList<>();
+	private boolean operational = true;
+	private final int TRANS_FAULT_SLEEP_TIME = 2000;
 
 	/**
 	 * Constructor for Elevator object.
@@ -79,14 +84,16 @@ public class Elevator implements Runnable {
 	@Override
 	public void run() {
 		System.out.println(Thread.currentThread().getName() + ": elevator starting on floor " + currentFloor + " in state " + state.toString());
-		while (true) {
+		while (operational) {
 			Set<FloorRequest> requests = getNextFloorRequest(); // gets next request from scheduler to process
 			FloorRequest request = requests.iterator().next();
 			if (requests.size() == 1 && request.isEndOfRequests()) {
 				exitElevatorSubsystem();
 			}
-			processElevatorEvents(requests);
-			state.handleRequest(this, requests);
+			boolean isHardFault =  processElevatorEvents(requests);
+			if (!isHardFault) {
+				state.handleRequest(this, requests);
+			}
 		}
 	}
 
@@ -119,10 +126,15 @@ public class Elevator implements Runnable {
 	 * 
 	 * @param events The Set of events currently being processed
 	 */
-	private void processElevatorEvents(Set<FloorRequest> requests) {
+	private boolean processElevatorEvents(Set<FloorRequest> requests) {
 
 		printReceivedRequests(requests);
-
+		
+		Set<ElevatorEvent> events = convertToElevatorEventSet(requests);
+		if (checkAndHandleFault(events)) {
+			return true;
+		}
+		
 		int eventFloorNumber = requests.iterator().next().getElevatorEvent().getFloorNumber();
 		
 		//Move to the appropriate floor if the elevator is not already there
@@ -132,6 +144,8 @@ public class Elevator implements Runnable {
 		}
 		
 		printPeopleEntered(requests);
+		
+		return false;
 	}
 	
 	/**
@@ -163,11 +177,13 @@ public class Elevator implements Runnable {
 	 * Helper method to set a response for the scheduler
 	 * 
 	 * @param events The Set of ElevatorEvents to response with
+	 * @param isHardFault The boolean used to distinguish if hard fault occured. 
 	 */
-	public void setResponseForScheduler(Set<ElevatorEvent> events) {
+	public void setResponseForScheduler(Set<ElevatorEvent> events, boolean isHardFault) {
+		String message = (isHardFault) ? " has failed due to a hard fault" : " has been processed successfully";
 		StringBuilder sb = new StringBuilder();
 		for (ElevatorEvent e: events) {
-			sb.append(e.toString() + " has been processed successfully").append("\n");
+			sb.append(e.toString() + message).append("\n");
 		}
 		sb.setLength(sb.length() - 1);
 		String responseMessage = sb.toString();
@@ -184,6 +200,7 @@ public class Elevator implements Runnable {
 		byte[] data = UDPUtil.convertToBytes(response);
 		DatagramPacket packet = new DatagramPacket(data, data.length, Scheduler.ADDRESS, Scheduler.ELEVATOR_RESPONSE_PORT);
 		UDPUtil.sendPacket(socket, packet);
+		System.out.println(Thread.currentThread().getName() + ": sending response to Scheduler");
 		receiveAcknowledgment(); //Receives acknowledgment pack from the scheduler
 	}
 	
@@ -195,6 +212,66 @@ public class Elevator implements Runnable {
 		UDPUtil.receivePacket(socket, acknowledgementPacket);
 		System.out.print(Thread.currentThread().getName() + ": Received acknowledgment packet from Scheduler containing "
 				+ new String(acknowledgementPacket.getData(), 0, acknowledgementPacket.getLength()) + "\n");
+	}
+	
+	/**
+	 * Converts set of FloorRequests to set of ElevatorEvents
+	 * 
+	 * @param requests The FloorRequests set to convert.
+	 * @return a set of ElevatorEvents
+	 */
+	public Set<ElevatorEvent> convertToElevatorEventSet(Set<FloorRequest> requests) {
+		return requests.stream().map(request -> request.getElevatorEvent()).collect(Collectors.toSet());
+	}
+	
+	/**
+	 * Checks the set of ElevatorEvents for a fault and handles it.
+	 * 
+	 * @param events The set of ElevatorEvents.
+	 * @return True if hard fault, otherwise false.
+	 */
+	public boolean checkAndHandleFault(Set<ElevatorEvent> events) {
+		//Check for fault in request set
+		for(ElevatorEvent event: events) {
+			Fault fault = event.getFault();
+			
+			if (fault == Fault.HARD_FAULT) {
+				handleHardFault(events);
+				return true; // Need to return so events do not get processed
+			}
+			
+			else if (fault == Fault.TRANSIENT_FAULT) {
+				handleTransientFault();
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Handles a hard fault ElevatorEvent (shuts down Elevator).
+	 * 
+	 * @param events The set of events to send a response.
+	 */
+	private void handleHardFault(Set<ElevatorEvent> events) {
+			System.out.println(Thread.currentThread().getName() + ": encountered a hard fault");
+			setResponseForScheduler(events, true);
+			operational = false;
+			System.out.println(Thread.currentThread().getName() + ": shutting down!");
+	}
+	
+	/**
+	 * Handles transient faults.
+	 */
+	private void handleTransientFault() {
+		try {
+			System.out.println(Thread.currentThread().getName() + ": encountered a transient fault");
+			Thread.sleep(TRANS_FAULT_SLEEP_TIME);
+			System.out.println(Thread.currentThread().getName() + ": resolved it's transient fault");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	/**

@@ -138,7 +138,7 @@ public class ElevatorState {
 
 			if (peopleExitedOnFloor) {
 				handleReachedDestination(elevator, events.iterator().next().getCarButton(), true);
-				elevator.setResponseForScheduler(events);
+				elevator.setResponseForScheduler(events, false);
 			}
 			
 			if (!newRequests.isEmpty()) { 
@@ -150,8 +150,14 @@ public class ElevatorState {
 					handleReachedDestination(elevator, nextFloor, false);
 				
 				elevator.printPeopleEntered(newRequests);
+				
+				Set<ElevatorEvent> newEvents = elevator.convertToElevatorEventSet(newRequests);
+				
+				if (elevator.checkAndHandleFault(newEvents)) {
+					return;
+				}
 			}
-		
+			
 			//continue moving if there are still more requests to serve
 			if (!requests.isEmpty() && this.getDirection() != direction) {
 				closeDoors();
