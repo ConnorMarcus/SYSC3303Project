@@ -207,7 +207,7 @@ public class Elevator implements Runnable {
 	/**
 	 * Receives an acknowledgement packet from the scheduler
 	 */
-	private void receiveAcknowledgment() {
+	public void receiveAcknowledgment() {
 		DatagramPacket acknowledgementPacket = new DatagramPacket(new byte[UDPUtil.RECEIVE_PACKET_LENGTH], UDPUtil.RECEIVE_PACKET_LENGTH);
 		UDPUtil.receivePacket(socket, acknowledgementPacket);
 		System.out.print(Thread.currentThread().getName() + ": Received acknowledgment packet from Scheduler containing "
