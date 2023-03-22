@@ -1,11 +1,12 @@
-# Group 9 - Iteration 3
+# Group 9 - Iteration 4
 Group Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
 
-## Files 
+## Project Structure 
 The following is a brief description of the Java files contained within the project:
 - `Elevator.java` represents the Elevator subsystem which communicates with the Scheduler to process elevator events.
 - `ElevatorEvent.java` represents each text line from the input file as an object.
 - `ElevatorState.java` represents the state of the elevator subsystem.
+- `ElevatorRequest.java` represents a request from the Elevator to the Scheduler indicating it's ready to receive a FloorRequest. 
 - `EleavtorResponse.java` represents a response object the elevator sends out to the scheduler after an event has occurred.
 - `Floor.java` represents the floor subsystem which handles the parsing of the input file and communicating that with the Scheduler.
 - `FloorRequest.java` represents a request made from the floor subsystem to the Scheduler.
@@ -15,24 +16,35 @@ The following is a brief description of the Java files contained within the proj
 - `SchedulerReceivingSendingState.java` represents the concrete state of the scheduler when it can receive and respond to requests
 - `Time.java` represents the time stamp from the input file request in the following format: hh:mm:ss.mmm
 - `UDPUtil.java` is a utility class for UPD-related functions such as: creating sockets, packets, sending and receiving packets, etc.
-- `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
-- The above classes all have an associated JUnit test file
 
-## Breakdown of Responsibilities for Iteration 3
+*Above classes have associated JUnit test files*
+
+- `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
+
+## Responsibilty Breakdown
+
+### Iteration 4
+- **Connor**: Added appropriate Iteration 4 changes to Scheduler, Elevator, ElevatorState
+- **Ilyes**: UML Class diagram, refactoring
+- **Noah**: Added appropriate Iteration 4 changes to Scheduler, Elevator, ElevatorState, ElevatorRequest
+- **Patrick**: Timing diagram, refactoring
+- **Vahid**: README, added Acknowledgements from Scheduler to Elevator and Floor, JUnit test cases
+
+### Iteration 3
 - **Connor**: UDPUtil.java, updated Scheduler, Elevator, and Floor
 - **Ilyes**: UML Class diagram, updated Scheduler and Floor
 - **Noah**: JUnit test cases, updated Scheduler, Elevator, and Floor
 - **Patrick**: Sequence diagram, updated Scheduler, Elevator, and Floor
 - **Vahid**: README, updated ElevatorState, ElevatorEvent, Floor, and Time
 
-## Breakdown of Responsabilities for Iteration 2
+### Iteration 2
 - **Connor**: SchedulerReceivingState.java, SchedulerReceivingSendingState.java, sequence diagram
 - **Ilyes**: SchedulerState.java, refactoring, UML class diagram
 - **Noah**: ElevatorState.java, state diagram, README
 - **Patrick**: JUnit tests, refactoring, README
 - **Vahid**: ElevatorState.java, state diagram
 
-## Breakdown of Responsabilities for Iteration 1
+### Iteration 1
 - **Connor**: Time.java, ElevatorResponse.java, FloorRequest.java and README.txt.
 - **Ilyes**: JUnit testing, refactoring and UML Class diagram.
 - **Noah**: Elevator.java, ElevatorEvent.java and README.txt
