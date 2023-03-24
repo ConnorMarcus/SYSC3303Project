@@ -24,10 +24,10 @@ The following is a brief description of the Java files contained within the proj
 ## Responsibilty Breakdown
 
 ### Iteration 4
-- **Connor**: Added appropriate Iteration 4 changes to Scheduler, Elevator, ElevatorState
-- **Ilyes**: UML Class diagram, refactoring
-- **Noah**: Added appropriate Iteration 4 changes to Scheduler, Elevator, ElevatorState, ElevatorRequest
-- **Patrick**: Timing diagram, refactoring
+- **Connor**: Added fault handling code to Scheduler, Elevator, ElevatorState, and updated elevator state machine diagram
+- **Ilyes**: UML Class diagram, refactoring/testing, added additional code for faults
+- **Noah**: Added fault handling code to Scheduler, Elevator, ElevatorState, ElevatorRequest
+- **Patrick**: Timing diagram, sequence diagrams, refactoring, added additional code for faults
 - **Vahid**: README, added Acknowledgements from Scheduler to Elevator and Floor, JUnit test cases
 
 ### Iteration 3
