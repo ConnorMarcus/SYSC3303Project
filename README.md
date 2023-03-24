@@ -70,6 +70,7 @@ The following is a brief description of the Java files contained within the proj
     curl ifconfig.me
     ```
 - The number of elevators that are running can be changed by changing the NUM_CARS constant in Elevator.java.
+- You can adjust the floor_input.txt file to simulate the different kind of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
 
 3. Once the project has been run, you should see output in the console corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
 
