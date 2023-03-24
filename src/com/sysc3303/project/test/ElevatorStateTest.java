@@ -22,7 +22,7 @@ class ElevatorStateTest {
     public static final String STOPPED_STRING = ElevatorEvent.Direction.STOPPED.toString() + STATE_STRING;
     public static final String UP_STRING = ElevatorEvent.Direction.UP.toString() + STATE_STRING;
     public static final String DOWN_STRING = ElevatorEvent.Direction.DOWN.toString() + STATE_STRING;
-    private static final boolean SHOULD_SLEEP = false;
+    private static final boolean SHOULD_SLEEP = false; //do not sleep in test cases
 
     @BeforeEach
     public void setUpBeforeClass() {
@@ -125,5 +125,35 @@ class ElevatorStateTest {
         elevatorState.goToFloor(elevator, Direction.UP, 2);
         elevatorState.handleReachedDestination(elevator, 2, false);
         assertEquals(STOPPED_STRING, elevator.getState().toString());
+    }
+    
+    @Test
+    public void testHandleFaults() {
+		Set<ElevatorEvent> events = new HashSet<ElevatorEvent>();
+		ElevatorEvent ee1 = new ElevatorEvent(new Time("1", "1", "1", "1"), 1, Direction.UP, 2, Fault.NO_FAULT);
+
+		ElevatorEvent ee2 = new ElevatorEvent(new Time("2", "2", "2", "2"), 4, Direction.DOWN, 3, Fault.HARD_FAULT);
+
+		ElevatorEvent ee3 = new ElevatorEvent(new Time("1", "1", "1", "1"), 1, Direction.UP, 2, Fault.TRANSIENT_FAULT);
+
+		events.add(ee1);
+		assertEquals(false, elevatorState.handleFaults(elevator, events));
+
+		events.clear();
+		events.add(ee2);
+
+		// Need a thread for the scheduler to send acknowledgement
+		Scheduler scheduler = new Scheduler();
+		Thread schedulerThread = new Thread(() -> {
+			scheduler.receiveResponseFromElevator();
+		});
+		schedulerThread.start();
+
+		assertEquals(true, elevatorState.handleFaults(elevator, events));
+		scheduler.closeSockets();
+
+		events.clear();
+		events.add(ee3);
+		assertEquals(false, elevatorState.handleFaults(elevator, events));
     }
 }
