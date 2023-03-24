@@ -24,7 +24,6 @@ public class Elevator implements Runnable {
 	private final DatagramSocket socket;
 	private static ArrayList<Elevator> elevators = new ArrayList<>();
 	private boolean operational = true;
-	private final int TRANS_FAULT_SLEEP_TIME = 2000;
 
 	/**
 	 * Constructor for Elevator object.
@@ -69,6 +68,15 @@ public class Elevator implements Runnable {
 	 */
 	public void setCurrentFloor(int floor) {
 		this.currentFloor = floor;
+	}
+	
+	/**
+	 * Sets if the elevator is operational or not
+	 * 
+	 * @param isOperational true if the elevator is operational, and false otherwise
+	 */
+	public void setOperational(boolean isOperational) {
+		operational = isOperational;
 	}
 	
 	/**
@@ -230,49 +238,10 @@ public class Elevator implements Runnable {
 	 * @param events The set of ElevatorEvents.
 	 * @return True if hard fault, otherwise false.
 	 */
-	public boolean checkAndHandleFault(Set<ElevatorEvent> events) {
-		//Check for fault in request set
-		for(ElevatorEvent event: events) {
-			Fault fault = event.getFault();
-			
-			if (fault == Fault.HARD_FAULT) {
-				handleHardFault(events);
-				return true; // Need to return so events do not get processed
-			}
-			
-			else if (fault == Fault.TRANSIENT_FAULT) {
-				handleTransientFault();
-			}
-		}
-		
-		return false;
+	private boolean checkAndHandleFault(Set<ElevatorEvent> events) {
+		return state.handleFaults(this, events);
 	}
 	
-	/**
-	 * Handles a hard fault ElevatorEvent (shuts down Elevator).
-	 * 
-	 * @param events The set of events to send a response.
-	 */
-	private void handleHardFault(Set<ElevatorEvent> events) {
-			System.out.println(Thread.currentThread().getName() + ": encountered a hard fault");
-			setResponseForScheduler(events, true);
-			operational = false;
-			System.out.println(Thread.currentThread().getName() + ": shutting down!");
-	}
-	
-	/**
-	 * Handles transient faults.
-	 */
-	private void handleTransientFault() {
-		try {
-			System.out.println(Thread.currentThread().getName() + ": encountered a transient fault");
-			Thread.sleep(TRANS_FAULT_SLEEP_TIME);
-			System.out.println(Thread.currentThread().getName() + ": resolved it's transient fault");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
 
 	/**
 	 * Closes the socket for each elevator so they are not waiting to receive from the scheduler after
