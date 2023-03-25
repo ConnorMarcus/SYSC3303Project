@@ -16,7 +16,7 @@ import com.sysc3303.project.ElevatorEvent.Fault;
  *
  */
 public class Floor implements Runnable {
-	public static final int NUM_FLOORS = 5;
+	public static final int NUM_FLOORS = 22;
 	public static final int BOTTOM_FLOOR = 1;
 	public static final int PORT = 5552;
 	public static final InetAddress ADDRESS = UDPUtil.getLocalHost();
