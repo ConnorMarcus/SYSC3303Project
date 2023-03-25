@@ -1,29 +1,27 @@
 package com.sysc3303.project;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Panel;
-
+import java.awt.FlowLayout; 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import com.sysc3303.project.ElevatorEvent.Direction;
-
 /**
- * Class to represent a request made by an Elevator.
+ * Class to create the JFrame that holds each ElevatorPanel in the GUI. 
  * 
  * @author Group 9
  */
 public class GUI extends JFrame {
 	
+	/**
+	 * Constructor for the GUI object.
+	 */
 	public GUI() {
 		super();
 		initializeJFrame();
 	}
 	
+	/**
+	 * Initializes the JFrame. 
+	 */
 	public void initializeJFrame() {
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setResizable(false);
@@ -33,6 +31,10 @@ public class GUI extends JFrame {
         this.setVisible(true);
 	}
 	
+	/**
+	 * Add the corresponding GUI ElevatorPanel from each Elevator of the system. 
+	 * 
+	 */
 	public void addPanels() {
 		for(Elevator e: Elevator.elevators) {
 			this.add(e.getElevatorPanel());

@@ -161,6 +161,13 @@ public class ElevatorState {
 		}
 	}
 	
+	/**
+	 * Handle updating elevator floor by incrementing its current floor
+	 * and updating the GUI to show the changes.  
+	 * 
+	 * @param direction	Direction elevator is moving in
+	 * @param elevator
+	 */
 	private void updateFloor(Direction direction, Elevator elevator) {
 		if(direction == Direction.UP) {
 			elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);
@@ -263,15 +270,33 @@ public class ElevatorState {
 
 	}
 	
+	/**
+	 * Update console and GUI when elevator reaches a floor.
+	 * 
+	 * @param elevator
+	 */
 	private void reachedFloor(Elevator elevator) {
 		System.out.println(Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
 		elevator.getElevatorPanel().removeStar(elevator.getCurrentFloor());
 	}
+	
+	/**
+	 * Update console and GUI when elevator button is turned off 
+	 * when it reaches the destination.
+	 * 
+	 * @param floorNum 		of destination
+	 * @param elevator
+	 */
 	private void turnButtonOff(int floorNum, Elevator elevator) {
 		System.out.println(Thread.currentThread().getName() + ": Button " + floorNum + " Light is OFF");
 		elevator.getElevatorPanel().unHighlightDestination(floorNum);
 	}
 	
+	/**
+	 * Update console and GUI when elevators door open.
+	 * 
+	 * @param elevator
+	 */
 	private void doorsOpening(Elevator elevator) {
 		System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
 		elevator.getElevatorPanel().openDoorsLabel();

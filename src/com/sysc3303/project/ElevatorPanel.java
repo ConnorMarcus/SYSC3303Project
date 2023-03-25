@@ -13,8 +13,9 @@ import javax.swing.SwingConstants;
 import com.sysc3303.project.ElevatorEvent.Direction;
 
 /**
+ * ElevatorPanel that shows all the associated components for each Elevator  
+ * 
  * @author Group 9
- *
  */
 public class ElevatorPanel extends JPanel {
 	private final int WIDTH = 125;
@@ -31,6 +32,9 @@ public class ElevatorPanel extends JPanel {
     private final String HARD_FAULT_ICON  = "Resources/images/hardFaultIcon.png";
     
 	
+   /**
+    * Constructor for the ElevatorPanel object.
+    */
 	public ElevatorPanel() {
 		super();
 		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -38,6 +42,9 @@ public class ElevatorPanel extends JPanel {
 		initializeComponents();
 	}
 	
+	/**
+	 * Initialize components to the Elevator JPanel.
+	 */
 	private void initializeComponents() {
 		createFloorLabel();
 		createSlider();
@@ -47,6 +54,9 @@ public class ElevatorPanel extends JPanel {
 		this.add(doorsLabel);
 	}
 	
+	/**
+	 * Create JSlider component that shows the Elevator moving through the floors. 
+	 */
 	private void createSlider() {
 		slider = new JSlider(SwingConstants.VERTICAL, Floor.BOTTOM_FLOOR, Floor.NUM_FLOORS, Floor.BOTTOM_FLOOR);
 		slider.setPreferredSize(new Dimension(WIDTH, HEIGHT - 150));
@@ -71,6 +81,10 @@ public class ElevatorPanel extends JPanel {
 	    slider.setLabelTable(table);
 	}
 	
+	/**
+	 * Create label showing the current floor of the elevator with icons indicating
+	 * the direction it's going or if a fault occurs. 
+	 */
 	private void createFloorLabel() {
 		 floorLabel = new JLabel(String.valueOf(Floor.BOTTOM_FLOOR));
 	     floorLabel.setFont(new Font("Aharoni", 0, 20));
@@ -81,7 +95,9 @@ public class ElevatorPanel extends JPanel {
 	     floorLabel.setHorizontalAlignment(JLabel.CENTER);
 	}
 	
-	
+	/**
+	 * Create door label that indicates when the elevator doors are open or closed. 
+	 */
 	private void createDoorLabel() {
 		 doorsLabel = new JLabel("[|   |]");
 	     doorsLabel.setFont(new Font("Aharoni", 0, 20));
@@ -91,21 +107,36 @@ public class ElevatorPanel extends JPanel {
 	     doorsLabel.setHorizontalAlignment(JLabel.CENTER);
 	}
 	
-	
+	/**
+	 * Changes the Door Label to closed.
+	 */
 	public void closeDoorsLabel() {
 		doorsLabel.setText("[|]");
 	}
 	
-	
+	/**
+	 * Changes the Door Label to open. 
+	 */
 	public void openDoorsLabel() {
 		doorsLabel.setText("[|   |]");
 	}
 	
+	/**
+	 * Update Floor Label with respective icon and color.  
+	 * 
+	 * @param path	String path to corresponding icon
+	 * @param color	Color of label
+	 */
 	private void updateFloorLabel(String path, Color color) {
 		floorLabel.setIcon(new ImageIcon(path));
 		floorLabel.setForeground(color);
 	}
 	
+	/**
+	 * Handles state change 
+	 * 
+	 * @param state	String corresponding to corresponding ElevatorState
+	 */
 	public void handleStateChange(String state) {
 		if (state.equals(Direction.UP.toString())) {
 			handleGoingUpState();
@@ -121,13 +152,18 @@ public class ElevatorPanel extends JPanel {
 		} 
 	}
 	
+	/**
+	 * Updated floor label and icon when going up. 
+	 */
 	private void handleGoingUpState() {
 		if (floorLabel.getIcon() == null) {
 			updateFloorLabel(UP_ICON, GREEN_COLOR);
 		}
 	}
 	
-	
+	/**
+	 * Updated floor label and icon when going down. 
+	 */
 	private void handleGoingDownState() {
 		if (floorLabel.getIcon() == null) {
 			updateFloorLabel(DOWN_ICON, RED_COLOR);
@@ -135,6 +171,9 @@ public class ElevatorPanel extends JPanel {
 	
 	}
 	
+	/**
+	 * Updated slider when elevator is going up. 
+	 */
 	public void goingUp() {
 		int floorNum = slider.getValue() + 1;
 		slider.setValue(floorNum);
@@ -142,6 +181,9 @@ public class ElevatorPanel extends JPanel {
 
 	}
 	
+	/**
+	 * Updated slider when elevator is going down. 
+	 */
 	public void goingDown() {
 		int floorNum = slider.getValue() - 1;
 		slider.setValue(floorNum);
@@ -149,15 +191,24 @@ public class ElevatorPanel extends JPanel {
 
 	}
 	
+	/**
+	 * Updated floor label when elevator is in stopped state. 
+	 */
 	private void handleStopped() {
 		floorLabel.setIcon(null);
 		floorLabel.setForeground(Color.white);
 	}
 	
+	/**
+	 * Indicate transient fault in the floor label.  
+	 */
 	private void handleTransientFault() {
 		updateFloorLabel(TRANS_FAULT_ICON, YELLOW_COLOR);
 	}
 	
+	/**
+	 * Indicate hard fault in elevator. 
+	 */
 	public void handleHardFault() {
 		updateFloorLabel(HARD_FAULT_ICON, RED_COLOR);
 		slider.setForeground(RED_COLOR);
@@ -166,36 +217,47 @@ public class ElevatorPanel extends JPanel {
 	    }
 	}
 	
+	/**
+	 * Highlight destination of floor request on the elevator's slider. 
+	 * 
+	 * @param floorNum destination of floor request
+	 */
 	public void highlightDestination(int floorNum) {
 	   ((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.cyan);
 	   slider.repaint();
 	}
 	
+	/**
+	 * Remove highlight from the destination of the elevator's request when you 
+	 * arrive there. 
+	 * 
+	 * @param floorNum destination of floor request
+	 */
 	public void unHighlightDestination(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.white);	
 		slider.repaint();
 	}
 	
+	/**
+	 * Add a star beside the floor number on the elevator's slider indicating that 
+	 * someone has requested the elevator on that floor. 
+	 * 
+	 * @param floorNum floor someone is waiting for the elevator at
+	 */
 	public void addStar(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(floorNum + " *");	
 		slider.repaint();
 	}
 	
+	/**
+	 * Remove star from floor number on the elevator's slider when you arrive to
+	 * pick up the person waiting for the elevator. 
+	 * 
+	 * @param floorNum where person is waiting for the elevator
+	 */
 	public void removeStar(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(String.valueOf(floorNum));
 		slider.repaint();
 	}
 	
-	/*
-	 * Get request --> put star on request origin
-	 * 
-	 * Navigate to request origin --> 	if you have to move --> closeDoors, handleMoving, handleStop, remove star, open doors
-	 * 								--> don't move --> remove star 
-	 * 
-	 * Navigate to destination --> highlight destination, close doors, handleMoving, handle stop, remove highlight, open doors 
-	 * 
-	 * faults --> handle it
-	 * 
-	 */
-
 }
