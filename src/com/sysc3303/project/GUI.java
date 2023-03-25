@@ -18,12 +18,14 @@ import com.sysc3303.project.ElevatorEvent.Direction;
  * @author Group 9
  */
 public class GUI extends JFrame {
-	public ElevatorPanel panel;
 	
 	public GUI() {
 		super();
+		initializeJFrame();
+	}
+	
+	public void initializeJFrame() {
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(550, 600));
         this.setResizable(false);
         this.setLayout(new FlowLayout());
         this.addPanels();
@@ -32,34 +34,9 @@ public class GUI extends JFrame {
 	}
 	
 	public void addPanels() {
-		panel = new ElevatorPanel();
-		this.add(panel);
-		this.add(new ElevatorPanel());
-		this.add(new ElevatorPanel());
-		this.add(new ElevatorPanel());
+		for(Elevator e: Elevator.elevators) {
+			this.add(e.getElevatorPanel());
+		}
 	}
 	
-	public static void main(String[] args) throws InterruptedException {
-		GUI test = new GUI();
-		
-		while (true) {
-		
-			test.panel.closeDoorsLabel();
-			test.panel.addStar(22);
-			test.panel.handleMoving(Direction.UP);
-			Thread.sleep(2000);
-			test.panel.handleMoving(Direction.UP);
-			Thread.sleep(2000);
-			test.panel.removeStar(22);
-			test.panel.handleStopped();
-			test.panel.openDoorsLabel();
-			Thread.sleep(2000);
-			test.panel.handleHardFault();
-			Thread.sleep(2000);
-			break;
-			
-		}
-		
-	}
-
 }

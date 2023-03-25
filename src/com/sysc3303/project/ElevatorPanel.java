@@ -106,61 +106,96 @@ public class ElevatorPanel extends JPanel {
 		floorLabel.setForeground(color);
 	}
 	
-	public void handleMoving(Direction direction) {
-		if (direction == Direction.UP) {
-			int floorNum = slider.getValue() + 1;
-			slider.setValue(floorNum);
-			floorLabel.setText(String.valueOf(floorNum));
-			if (floorLabel.getIcon() == null) {
-				updateFloorLabel(UP_ICON, GREEN_COLOR);
-			}
+	public void handleStateChange(String state) {
+		if (state.equals(Direction.UP.toString())) {
+			handleGoingUpState();
 		}
-		
-		else {
-			int floorNum = slider.getValue() - 1;
-			slider.setValue(floorNum);
-			floorLabel.setText(String.valueOf(floorNum));
-			
-			if (floorLabel.getIcon() == null) {
-				updateFloorLabel(DOWN_ICON, RED_COLOR);
-			}
+		else if (state.equals(Direction.DOWN.toString())) {
+			handleGoingDownState();
+		}
+		else if (state.equals(Direction.STOPPED.toString())) {
+			handleStopped();
+		}
+		else if (state.equals(ElevatorState.REPAIRING_STATE_NAME)){
+			handleTransientFault();
+		} 
+	}
+	
+	private void handleGoingUpState() {
+		if (floorLabel.getIcon() == null) {
+			updateFloorLabel(UP_ICON, GREEN_COLOR);
 		}
 	}
 	
-	public void handleStopped() {
+	
+	private void handleGoingDownState() {
+		if (floorLabel.getIcon() == null) {
+			updateFloorLabel(DOWN_ICON, RED_COLOR);
+		}
+	
+	}
+	
+	public void goingUp() {
+		int floorNum = slider.getValue() + 1;
+		slider.setValue(floorNum);
+		floorLabel.setText(String.valueOf(floorNum));
+
+	}
+	
+	public void goingDown() {
+		int floorNum = slider.getValue() - 1;
+		slider.setValue(floorNum);
+		floorLabel.setText(String.valueOf(floorNum));
+
+	}
+	
+	private void handleStopped() {
 		floorLabel.setIcon(null);
 		floorLabel.setForeground(Color.white);
 	}
 	
-	public void handleTransientFault() {
+	private void handleTransientFault() {
 		updateFloorLabel(TRANS_FAULT_ICON, YELLOW_COLOR);
 	}
 	
 	public void handleHardFault() {
 		updateFloorLabel(HARD_FAULT_ICON, RED_COLOR);
 		slider.setForeground(RED_COLOR);
-		
 	    for (int i = Floor.BOTTOM_FLOOR; i <= Floor.NUM_FLOORS; i++) {
 	    	((JLabel) slider.getLabelTable().get(i)).setForeground(RED_COLOR);
 	    }
 	}
 	
 	public void highlightDestination(int floorNum) {
-	   ((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.cyan);	
+	   ((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.cyan);
+	   slider.repaint();
 	}
 	
 	public void unHighlightDestination(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.white);	
+		slider.repaint();
 	}
 	
 	public void addStar(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(floorNum + " *");	
+		slider.repaint();
 	}
 	
 	public void removeStar(int floorNum) {
-		   ((JLabel) slider.getLabelTable().get(floorNum)).setText(String.valueOf(floorNum));	
-		}
+		((JLabel) slider.getLabelTable().get(floorNum)).setText(String.valueOf(floorNum));
+		slider.repaint();
+	}
 	
-	
+	/*
+	 * Get request --> put star on request origin
+	 * 
+	 * Navigate to request origin --> 	if you have to move --> closeDoors, handleMoving, handleStop, remove star, open doors
+	 * 								--> don't move --> remove star 
+	 * 
+	 * Navigate to destination --> highlight destination, close doors, handleMoving, handle stop, remove highlight, open doors 
+	 * 
+	 * faults --> handle it
+	 * 
+	 */
 
 }

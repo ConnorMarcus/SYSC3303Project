@@ -7,6 +7,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
+
 import com.sysc3303.project.ElevatorEvent.Direction;
 import com.sysc3303.project.ElevatorEvent.Fault;
 
@@ -21,7 +24,7 @@ public class ElevatorState {
 	private String stateName;
 	private final int TIME_REACH_FLOOR_BEFORE_DOORS_OPEN = 1000;
 	private final int TIME_DOORS_OPEN = 3000;
-	private final int TIME_TO_MOVE_AFTER_DOORS_CLOSE = 2000;
+	private final int TIME_BETWEEN_FLOORS = 2000;
 	private final int TRANS_FAULT_SLEEP_TIME = 5000;
 	public static final String REPAIRING_STATE_NAME = "REPAIRING";
 
@@ -63,7 +66,7 @@ public class ElevatorState {
 			}
 
 			else if (fault == Fault.TRANSIENT_FAULT) {
-				handleTransientFault();
+				handleTransientFault(elevator);
 			}
 		}
 
@@ -80,21 +83,22 @@ public class ElevatorState {
 		elevator.setResponseForScheduler(events, true);
 		elevator.setOperational(false);
 		System.out.println(Thread.currentThread().getName() + ": shutting down!");
+		elevator.getElevatorPanel().handleHardFault();
 	}
 	
 	/**
 	 * Handles transient faults.
 	 */
-	private void handleTransientFault() {
+	private void handleTransientFault(Elevator elevator) {
 		try {
 			System.out.println(Thread.currentThread().getName() + ": elevator encountered a transient fault");
-			setNewState(REPAIRING_STATE_NAME);
+			setNewState(REPAIRING_STATE_NAME, elevator);
 			if (shouldSleep) {
 				Thread.sleep(TRANS_FAULT_SLEEP_TIME); //Sleep to simulate repairing elevator
 			}
 			
 			System.out.println(Thread.currentThread().getName() + ": elevator resolved it's transient fault");
-			setNewState(ElevatorEvent.Direction.STOPPED.toString());
+			setNewState(ElevatorEvent.Direction.STOPPED.toString(), elevator);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -118,9 +122,9 @@ public class ElevatorState {
 	 * @param requests the Set of FLoorRequests
 	 */
 	public void handleRequest(Elevator elevator, Set<FloorRequest> requests) {
-		closeDoors();
+		closeDoors(elevator);
 		Direction direction = requests.iterator().next().getElevatorEvent().getDirection();
-		setNewState(direction.toString());
+		setNewState(direction.toString(), elevator);
 		moveBetweenFloors(elevator, requests);
 	}
 
@@ -132,11 +136,10 @@ public class ElevatorState {
 	 * @param requestedFloor the requested floor.
 	 */
 	public void goToFloor(Elevator elevator, ElevatorEvent.Direction direction, int requestedFloor) {
-		closeDoors();
-		setNewState(direction.toString());
+		closeDoors(elevator);
+		setNewState(direction.toString(), elevator);
 		if (shouldSleep)
-			sleepWhileMoving(Math.abs(requestedFloor - elevator.getCurrentFloor()));
-		elevator.setCurrentFloor(requestedFloor);
+			sleepWhileMoving(Math.abs(requestedFloor - elevator.getCurrentFloor()), elevator);
 		handleReachedDestination(elevator, requestedFloor, false);
 
 	}
@@ -147,13 +150,24 @@ public class ElevatorState {
 	 * 
 	 * @param numFloors the number of floors that the elevator is moving
 	 */
-	private void sleepWhileMoving(int numFloors) {
+	private void sleepWhileMoving(int numFloors, Elevator elevator) {	
 		for (int i = 0; i < numFloors; i++) {
 			try {
-				Thread.sleep(TIME_TO_MOVE_AFTER_DOORS_CLOSE);
+				Thread.sleep(TIME_BETWEEN_FLOORS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			updateFloor(getDirection(), elevator);
+		}
+	}
+	
+	private void updateFloor(Direction direction, Elevator elevator) {
+		if(direction == Direction.UP) {
+			elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);
+			elevator.getElevatorPanel().goingUp();
+		} else {
+			elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
+			elevator.getElevatorPanel().goingDown();
 		}
 	}
 
@@ -170,14 +184,14 @@ public class ElevatorState {
 		while (!requests.isEmpty()) {
 			if (shouldSleep) {
 				try {
-					Thread.sleep(TIME_TO_MOVE_AFTER_DOORS_CLOSE);
+					Thread.sleep(TIME_BETWEEN_FLOORS);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-
+			
 			int nextFloor = direction == Direction.UP ? elevator.getCurrentFloor() + 1 : elevator.getCurrentFloor() - 1;
-			elevator.setCurrentFloor(nextFloor);
+			updateFloor(direction, elevator);
 			Set<ElevatorEvent> events = new HashSet<>();
 
 			DatagramPacket receivePacket = elevator.sendAndReceiveRequest(nextFloor, direction);
@@ -217,8 +231,8 @@ public class ElevatorState {
 			
 			//continue moving if there are still more requests to serve
 			if (!requests.isEmpty() && this.getDirection() != direction) {
-				closeDoors();
-				setNewState(direction.toString());
+				closeDoors(elevator);
+				setNewState(direction.toString(), elevator);
 			}
 		}
 	}
@@ -229,17 +243,16 @@ public class ElevatorState {
 	 * 
 	 * @param elevator      the current elevator
 	 * @param floorNumber   the floor number that the elevator is stopping at
-	 * @param peopleExiting indicates if peoeple are exiting the elevator
+	 * @param peopleExiting indicates if people are exiting the elevator
 	 */
 	public void handleReachedDestination(Elevator elevator, int floorNum, boolean peopleExiting) {
 		try {
-			System.out.println(Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
-			setNewState(ElevatorEvent.Direction.STOPPED.toString());
-			if (shouldSleep)
-				Thread.sleep(TIME_REACH_FLOOR_BEFORE_DOORS_OPEN);
-			System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
+			reachedFloor(elevator);
+			setNewState(ElevatorEvent.Direction.STOPPED.toString(), elevator);
+			if (peopleExiting) turnButtonOff(floorNum, elevator);
+			if (shouldSleep) Thread.sleep(TIME_REACH_FLOOR_BEFORE_DOORS_OPEN);
+			doorsOpening(elevator);
 			if (peopleExiting) {
-				System.out.println(Thread.currentThread().getName() + ": Button " + floorNum + " Light is OFF");
 				System.out.println(Thread.currentThread().getName() + ": people have exited from the elevator");
 			}
 			if (shouldSleep)
@@ -249,6 +262,20 @@ public class ElevatorState {
 		}
 
 	}
+	
+	private void reachedFloor(Elevator elevator) {
+		System.out.println(Thread.currentThread().getName() + ": elevator reached floor " + elevator.getCurrentFloor());
+		elevator.getElevatorPanel().removeStar(elevator.getCurrentFloor());
+	}
+	private void turnButtonOff(int floorNum, Elevator elevator) {
+		System.out.println(Thread.currentThread().getName() + ": Button " + floorNum + " Light is OFF");
+		elevator.getElevatorPanel().unHighlightDestination(floorNum);
+	}
+	
+	private void doorsOpening(Elevator elevator) {
+		System.out.println(Thread.currentThread().getName() + ": elevator doors opening");
+		elevator.getElevatorPanel().openDoorsLabel();
+	}
 
 	/**
 	 * Sets the state of the elevator.
@@ -256,16 +283,18 @@ public class ElevatorState {
 	 * @param elevator the current elevator
 	 * @param name     the name of the state to transition the elevator to
 	 */
-	private void setNewState(String name) {
+	private void setNewState(String name, Elevator elevator) {
 		this.stateName = name;
 		System.out.println(Thread.currentThread().getName() + ": elevator currently in state " + this.toString());
+		elevator.getElevatorPanel().handleStateChange(name);
 	}
 	
 	/**
 	 * Closes the Elevator's doors
 	 */
-	private void closeDoors() {
+	private void closeDoors(Elevator elevator) {
 		System.out.println(Thread.currentThread().getName() + ": elevator doors closing");
+		elevator.getElevatorPanel().closeDoorsLabel();
 	}
 
 	/**
