@@ -23,18 +23,18 @@ public class ElevatorPanel extends JPanel {
 	private JLabel floorLabel;
 	public JSlider slider;
 	private JLabel doorsLabel;
-    private final Color GREEN_COLOR = new Color(0, 192, 0);
-    private final Color RED_COLOR = new Color(255, 48, 0);
-    private final Color YELLOW_COLOR = new Color(255, 193, 70);
-    private final String UP_ICON  = "Resources/images/upArrowIcon.png";
-    private final String DOWN_ICON  = "Resources/images/downArrowIcon.png";
-    private final String TRANS_FAULT_ICON  = "Resources/images/transientFaultIcon.png";
-    private final String HARD_FAULT_ICON  = "Resources/images/hardFaultIcon.png";
-    
-	
-   /**
-    * Constructor for the ElevatorPanel object.
-    */
+	private final Color GREEN_COLOR = new Color(0, 192, 0);
+	private final Color RED_COLOR = new Color(255, 48, 0);
+	private final Color YELLOW_COLOR = new Color(255, 193, 70);
+	private final String UP_ICON  = "Resources/images/upArrowIcon.png";
+	private final String DOWN_ICON  = "Resources/images/downArrowIcon.png";
+	private final String TRANS_FAULT_ICON  = "Resources/images/transientFaultIcon.png";
+	private final String HARD_FAULT_ICON  = "Resources/images/hardFaultIcon.png";
+	    
+		
+	   /**
+	* Constructor for the ElevatorPanel object.
+	*/
 	public ElevatorPanel() {
 		super();
 		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -73,11 +73,11 @@ public class ElevatorPanel extends JPanel {
 	    for (int i = Floor.BOTTOM_FLOOR; i <= Floor.NUM_FLOORS; i++) {
 	    	JLabel label = new JLabel(String.valueOf(i));
 	    	label.setForeground(Color.white);
-	    	label.setPreferredSize(new Dimension(label.getPreferredSize().width + 10, label.getPreferredSize().height));
-	        label.setFont(new Font("Aharoni", 0, 13));
+	    	label.setPreferredSize(new Dimension(
+	    			label.getPreferredSize().width + 10, label.getPreferredSize().height));
+	    	label.setFont(new Font("Aharoni", 0, 13));
 	    	table.put(i, label);
 	    }
-
 	    slider.setLabelTable(table);
 	}
 	
@@ -86,25 +86,25 @@ public class ElevatorPanel extends JPanel {
 	 * the direction it's going or if a fault occurs. 
 	 */
 	private void createFloorLabel() {
-		 floorLabel = new JLabel(String.valueOf(Floor.BOTTOM_FLOOR));
-	     floorLabel.setFont(new Font("Aharoni", 0, 20));
-	     floorLabel.setPreferredSize(new Dimension(WIDTH, 35));
-	     floorLabel.setForeground(Color.white);
-	     floorLabel.setIconTextGap(5);
-	     floorLabel.setVerticalAlignment(JLabel.CENTER);
-	     floorLabel.setHorizontalAlignment(JLabel.CENTER);
+		floorLabel = new JLabel(String.valueOf(Floor.BOTTOM_FLOOR));
+		floorLabel.setFont(new Font("Aharoni", 0, 20))
+		floorLabel.setPreferredSize(new Dimension(WIDTH, 35));
+		floorLabel.setForeground(Color.white);
+		floorLabel.setIconTextGap(5);
+		floorLabel.setVerticalAlignment(JLabel.CENTER);
+		floorLabel.setHorizontalAlignment(JLabel.CENTER);
 	}
 	
 	/**
 	 * Create door label that indicates when the elevator doors are open or closed. 
 	 */
 	private void createDoorLabel() {
-		 doorsLabel = new JLabel("[|   |]");
-	     doorsLabel.setFont(new Font("Aharoni", 0, 20));
-	     doorsLabel.setPreferredSize(new Dimension(WIDTH, 35));
-	     doorsLabel.setForeground(Color.white);
-	     doorsLabel.setVerticalAlignment(JLabel.CENTER);
-	     doorsLabel.setHorizontalAlignment(JLabel.CENTER);
+		doorsLabel = new JLabel("[|   |]");
+		doorsLabel.setFont(new Font("Aharoni", 0, 20));
+		doorsLabel.setPreferredSize(new Dimension(WIDTH, 35));
+		doorsLabel.setForeground(Color.white);
+		doorsLabel.setVerticalAlignment(JLabel.CENTER);
+		doorsLabel.setHorizontalAlignment(JLabel.CENTER);
 	}
 	
 	/**
@@ -223,8 +223,8 @@ public class ElevatorPanel extends JPanel {
 	 * @param floorNum destination of floor request
 	 */
 	public void highlightDestination(int floorNum) {
-	   ((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.cyan);
-	   slider.repaint();
+		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.cyan);
+		slider.repaint();
 	}
 	
 	/**
