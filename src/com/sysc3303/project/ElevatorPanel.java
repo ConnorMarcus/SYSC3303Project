@@ -87,7 +87,7 @@ public class ElevatorPanel extends JPanel {
 	 */
 	private void createFloorLabel() {
 		floorLabel = new JLabel(String.valueOf(Floor.BOTTOM_FLOOR));
-		floorLabel.setFont(new Font("Aharoni", 0, 20))
+		floorLabel.setFont(new Font("Aharoni", 0, 20));
 		floorLabel.setPreferredSize(new Dimension(WIDTH, 35));
 		floorLabel.setForeground(Color.white);
 		floorLabel.setIconTextGap(5);
