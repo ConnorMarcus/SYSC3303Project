@@ -87,8 +87,8 @@ public class ElevatorPanel extends JPanel {
 	 */
 	private void createFloorLabel() {
 		floorLabel = new JLabel(String.valueOf(Floor.BOTTOM_FLOOR));
-		floorLabel.setFont(new Font("Aharoni", 0, 20));
-		floorLabel.setPreferredSize(new Dimension(WIDTH, 35));
+		floorLabel.setFont(new Font("Aharoni", 0, 24));
+		floorLabel.setPreferredSize(new Dimension(WIDTH, 50));
 		floorLabel.setForeground(Color.white);
 		floorLabel.setIconTextGap(5);
 		floorLabel.setVerticalAlignment(JLabel.CENTER);
@@ -100,8 +100,8 @@ public class ElevatorPanel extends JPanel {
 	 */
 	private void createDoorLabel() {
 		doorsLabel = new JLabel("[|   |]");
-		doorsLabel.setFont(new Font("Aharoni", 0, 20));
-		doorsLabel.setPreferredSize(new Dimension(WIDTH, 35));
+		doorsLabel.setFont(new Font("Aharoni", 0, 32));
+		doorsLabel.setPreferredSize(new Dimension(WIDTH, 50));
 		doorsLabel.setForeground(Color.white);
 		doorsLabel.setVerticalAlignment(JLabel.CENTER);
 		doorsLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -245,7 +245,6 @@ public class ElevatorPanel extends JPanel {
 	 * @param floorNum floor someone is waiting for the elevator at
 	 */
 	public void addStar(int floorNum) {
-		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.yellow);
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(floorNum + " *");	
 		slider.repaint();
 	}
@@ -258,7 +257,6 @@ public class ElevatorPanel extends JPanel {
 	 */
 	public void removeStar(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(String.valueOf(floorNum));
-		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.white);
 		slider.repaint();
 	}
 	
