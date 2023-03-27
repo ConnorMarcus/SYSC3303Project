@@ -1,29 +1,29 @@
 package com.sysc3303.project;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Panel;
-
+import java.awt.FlowLayout; 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import com.sysc3303.project.ElevatorEvent.Direction;
-
 /**
- * Class to represent a request made by an Elevator.
+ * Class to create the JFrame that holds each ElevatorPanel in the GUI. 
  * 
  * @author Group 9
  */
 public class GUI extends JFrame {
-	public ElevatorPanel panel;
 	
+	/**
+	 * Constructor for the GUI object.
+	 */
 	public GUI() {
 		super();
+		initializeJFrame();
+	}
+	
+	/**
+	 * Initializes the JFrame. 
+	 */
+	public void initializeJFrame() {
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(550, 600));
         this.setResizable(false);
         this.setLayout(new FlowLayout());
         this.addPanels();
@@ -31,35 +31,14 @@ public class GUI extends JFrame {
         this.setVisible(true);
 	}
 	
+	/**
+	 * Add the corresponding GUI ElevatorPanel from each Elevator of the system. 
+	 * 
+	 */
 	public void addPanels() {
-		panel = new ElevatorPanel();
-		this.add(panel);
-		this.add(new ElevatorPanel());
-		this.add(new ElevatorPanel());
-		this.add(new ElevatorPanel());
+		for(Elevator e: Elevator.elevators) {
+			this.add(e.getElevatorPanel());
+		}
 	}
 	
-	public static void main(String[] args) throws InterruptedException {
-		GUI test = new GUI();
-		
-		while (true) {
-		
-			test.panel.closeDoorsLabel();
-			test.panel.addStar(22);
-			test.panel.handleMoving(Direction.UP);
-			Thread.sleep(2000);
-			test.panel.handleMoving(Direction.UP);
-			Thread.sleep(2000);
-			test.panel.removeStar(22);
-			test.panel.handleStopped();
-			test.panel.openDoorsLabel();
-			Thread.sleep(2000);
-			test.panel.handleHardFault();
-			Thread.sleep(2000);
-			break;
-			
-		}
-		
-	}
-
 }
