@@ -245,6 +245,7 @@ public class ElevatorPanel extends JPanel {
 	 * @param floorNum floor someone is waiting for the elevator at
 	 */
 	public void addStar(int floorNum) {
+		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.yellow);
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(floorNum + " *");	
 		slider.repaint();
 	}
@@ -257,6 +258,7 @@ public class ElevatorPanel extends JPanel {
 	 */
 	public void removeStar(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(String.valueOf(floorNum));
+		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.white);
 		slider.repaint();
 	}
 	
