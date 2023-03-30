@@ -65,7 +65,7 @@ The following is a brief description of the Java files contained within the proj
 
 ### Run the project in Eclipse:
 
-1. Load the project into Eclipse using the provided zip inside the submission zip: "LA3G9_milestone_3.zip". To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
+1. Load the project into Eclipse using the provided zip inside the final submission zip. To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
 
 2. Once the project is loaded in Eclipse, it can be run by running the following files in this order: Scheduler.java, Elevator.java, and Floor.java in the "src" directory under the "com.sysc3303.project" package (each file contains a main method).
 
