@@ -20,10 +20,11 @@ import com.sysc3303.project.ElevatorEvent.Fault;
 public class Elevator implements Runnable {
 	private ElevatorState state;
 	private int currentFloor = Floor.BOTTOM_FLOOR;
-	public static final int NUM_CARS = 3;
+	public static final int NUM_CARS = 4;
 	private final DatagramSocket socket;
-	private static ArrayList<Elevator> elevators = new ArrayList<>();
+	public static final ArrayList<Elevator> elevators = new ArrayList<>();
 	private boolean operational = true;
+	private ElevatorPanel guiElevatorPanel; 
 
 	/**
 	 * Constructor for Elevator object.
@@ -40,7 +41,19 @@ public class Elevator implements Runnable {
 	public Elevator(boolean shouldSleep) {
 		socket = UDPUtil.createDatagramSocket();
 		state = new ElevatorState(ElevatorEvent.Direction.STOPPED.toString(), shouldSleep);
+		guiElevatorPanel = new ElevatorPanel(); 
+		
 	}
+	
+	/**
+	 * Get elevator gui panel 
+	 * 
+	 * @return ElevatorPanel
+	 */
+	public ElevatorPanel getElevatorPanel() {
+		return guiElevatorPanel; 
+	}
+	
 	
 	/**
 	 * @return the current state of the elevator
@@ -148,6 +161,7 @@ public class Elevator implements Runnable {
 		//Move to the appropriate floor if the elevator is not already there
 		if (currentFloor != eventFloorNumber) {
 			ElevatorEvent.Direction direction = currentFloor < eventFloorNumber ? ElevatorEvent.Direction.UP : ElevatorEvent.Direction.DOWN;
+			guiElevatorPanel.addStar(eventFloorNumber);
 			state.goToFloor(this, direction, eventFloorNumber);
 		}
 		
@@ -177,6 +191,7 @@ public class Elevator implements Runnable {
 		
 		for (FloorRequest f: requests) {
 			System.out.println(Thread.currentThread().getName() + ": Button " + f.getElevatorEvent().getCarButton() + " Light is ON");
+			guiElevatorPanel.highlightDestination(f.getElevatorEvent().getCarButton());
 		}
 	}
 	
@@ -271,6 +286,7 @@ public class Elevator implements Runnable {
 			Thread t = new Thread(e, "ElevatorThread-" + (i + 1));
 			t.start();
 		}
+		new GUI(); 
 	}
 
 }
