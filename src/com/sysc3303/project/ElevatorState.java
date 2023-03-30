@@ -138,25 +138,26 @@ public class ElevatorState {
 	public void goToFloor(Elevator elevator, ElevatorEvent.Direction direction, int requestedFloor) {
 		closeDoors(elevator);
 		setNewState(direction.toString(), elevator);
-		if (shouldSleep)
-			sleepWhileMoving(Math.abs(requestedFloor - elevator.getCurrentFloor()), elevator);
+		moveToFloor(Math.abs(requestedFloor - elevator.getCurrentFloor()), elevator);
 		handleReachedDestination(elevator, requestedFloor, false);
 
 	}
 
 	/**
-	 * Sleeps for an amount of time corresponding to the distance the elevator is
-	 * moving
+	 * Move to a given floor to pick up a person
 	 * 
 	 * @param numFloors the number of floors that the elevator is moving
 	 */
-	private void sleepWhileMoving(int numFloors, Elevator elevator) {	
+	private void moveToFloor(int numFloors, Elevator elevator) {	
 		for (int i = 0; i < numFloors; i++) {
-			try {
-				Thread.sleep(TIME_BETWEEN_FLOORS);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			if (shouldSleep) {
+				try {
+					Thread.sleep(TIME_BETWEEN_FLOORS);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
+			
 			updateFloor(getDirection(), elevator);
 		}
 	}
