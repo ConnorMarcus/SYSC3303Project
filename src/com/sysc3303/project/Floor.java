@@ -25,6 +25,7 @@ public class Floor implements Runnable {
 	private final Queue<ElevatorEvent> eventQueue = new ArrayDeque<>();
 	private final Queue<String> responseQueue = new ArrayDeque<>();
 	private boolean shouldSleep = true; //flag to set whether the threads should sleep or not
+	private long startTime;
 
 	/**
 	 * A constructor for a FloorSubsystem
@@ -62,6 +63,8 @@ public class Floor implements Runnable {
 		Thread sendToScheduler = new Thread(() -> {
 			Time currentTime, previousTime; 
 			previousTime = eventQueue.peek().getTime(); 
+			// Get start time
+			startTime = System.nanoTime(); 
 			// Send events to scheduler
 			for (ElevatorEvent e : eventQueue) {
 				currentTime = e.getTime(); 
@@ -86,6 +89,7 @@ public class Floor implements Runnable {
 				receiveResponse();
 				System.out.println(Thread.currentThread().getName() + ": " + getLatestResponse());
 			}
+			outputPerformanceMeasure();
 			sendEndOfRequestsNotice();
 			receiveSocket.close();
 		}, "FloorThread-2");
@@ -202,5 +206,10 @@ public class Floor implements Runnable {
 	public static void main(String[] args) {
 		Thread floorThread = new Thread(new Floor(), "FloorSubsystem");
 		floorThread.start();
+	}
+	
+	private void outputPerformanceMeasure() {
+		long performance = (System.nanoTime() - startTime) / 1000000;
+		System.out.println(Thread.currentThread().getName() + ": " + "scheduler subsystem performance measure: " + performance + "ms");
 	}
 }
