@@ -1,15 +1,17 @@
-# Group 9 - Iteration 4
+# Group 9 - Iteration 5
 Group Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
 
 ## Project Structure 
 The following is a brief description of the Java files contained within the project:
 - `Elevator.java` represents the Elevator subsystem which communicates with the Scheduler to process elevator events.
 - `ElevatorEvent.java` represents each text line from the input file as an object.
+- `ElevatorPanel.java` represents the JPanel used to model the graphical components of an Elevator.
 - `ElevatorState.java` represents the state of the elevator subsystem.
 - `ElevatorRequest.java` represents a request from the Elevator to the Scheduler indicating it's ready to receive a FloorRequest. 
 - `EleavtorResponse.java` represents a response object the elevator sends out to the scheduler after an event has occurred.
 - `Floor.java` represents the floor subsystem which handles the parsing of the input file and communicating that with the Scheduler.
 - `FloorRequest.java` represents a request made from the floor subsystem to the Scheduler.
+- `GUI.java` represents the JFrame containing the complete GUI for the Elevator system.
 - `Scheduler.java` represents the Scheduler subsystem which communicates with both the floor and elevator subsystems.
 - `SchedulerState.java` represents the state of the Scheduler subsystem.
 - `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
@@ -22,6 +24,14 @@ The following is a brief description of the Java files contained within the proj
 - `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
 
 ## Responsibilty Breakdown
+
+
+### Iteration 5
+- **Connor**: Interfaced existing Elevator system with the GUI
+- **Ilyes**: UML Class diagram, refactoring, JUnit test cases
+- **Noah**: Added performance measuring capabilities to the Scheduler, ElevatorPanel.java
+- **Patrick**: Timing diagrams for performance measurements, refactoring project structure
+- **Vahid**: README, ElevatorPanel.java, GUI.java
 
 ### Iteration 4
 - **Connor**: Added fault handling code to Scheduler, Elevator, ElevatorState, and updated elevator state machine diagram
