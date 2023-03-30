@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -150,7 +151,12 @@ public class UDPUtil {
 	    try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes); ObjectInputStream in = new ObjectInputStream(byteStream)) {
 	        return in.readObject();
 	    } 
+	    catch (StreamCorruptedException e) {
+			System.exit(0);
+			return null;
+		}
 	    catch (Exception e) {
+	    	e.printStackTrace();
 			return null;
 		}
 	}

@@ -118,7 +118,7 @@ public class ElevatorEvent implements Serializable {
 	 * @return ElevatorEvent that denotes the program should finish
 	 */
 	public static ElevatorEvent createEndOfRequestsEvent() {
-		return new ElevatorEvent(null, 0, null, 0, Fault.SHUTDOWN);
+		return new ElevatorEvent(null, 1, null, 1, Fault.SHUTDOWN);
 	}
 
 	/**
