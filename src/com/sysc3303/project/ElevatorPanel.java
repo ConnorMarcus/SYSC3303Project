@@ -23,16 +23,19 @@ public class ElevatorPanel extends JPanel {
 	private JLabel floorLabel;
 	public JSlider slider;
 	private JLabel doorsLabel;
-	private final Color GREEN_COLOR = new Color(0, 192, 0);
-	private final Color RED_COLOR = new Color(255, 48, 0);
-	private final Color YELLOW_COLOR = new Color(255, 193, 70);
-	private final String UP_ICON  = "Resources/images/upArrowIcon.png";
-	private final String DOWN_ICON  = "Resources/images/downArrowIcon.png";
-	private final String TRANS_FAULT_ICON  = "Resources/images/transientFaultIcon.png";
-	private final String HARD_FAULT_ICON  = "Resources/images/hardFaultIcon.png";
+	private JLabel statusLabel;
+	private final static Color GREEN_COLOR = new Color(0, 192, 0);
+	private final static Color RED_COLOR = new Color(255, 48, 0);
+	private final static Color YELLOW_COLOR = new Color(255, 193, 70);
+	private final static String UP_ICON  = "Resources/images/upArrowIcon.png";
+	private final static String DOWN_ICON  = "Resources/images/downArrowIcon.png";
+	private final static String TRANS_FAULT_ICON  = "Resources/images/transientFaultIcon.png";
+	private final static String HARD_FAULT_ICON  = "Resources/images/hardFaultIcon.png";
+	private final static String DOORS_OPENS = "[|   |]";
+	private final static String DOORS_CLOSED = "[|]";
 	    
 		
-	   /**
+	/**
 	* Constructor for the ElevatorPanel object.
 	*/
 	public ElevatorPanel() {
@@ -49,9 +52,11 @@ public class ElevatorPanel extends JPanel {
 		createFloorLabel();
 		createSlider();
 		createDoorLabel();
+		createStatusLabel();
 		this.add(floorLabel);
 		this.add(slider);
 		this.add(doorsLabel);
+		this.add(statusLabel);
 	}
 	
 	/**
@@ -87,8 +92,8 @@ public class ElevatorPanel extends JPanel {
 	 */
 	private void createFloorLabel() {
 		floorLabel = new JLabel(String.valueOf(Floor.BOTTOM_FLOOR));
-		floorLabel.setFont(new Font("Aharoni", 0, 24));
-		floorLabel.setPreferredSize(new Dimension(WIDTH, 50));
+		floorLabel.setFont(new Font("Aharoni", 0, 22));
+		floorLabel.setPreferredSize(new Dimension(WIDTH, 35));
 		floorLabel.setForeground(Color.white);
 		floorLabel.setIconTextGap(5);
 		floorLabel.setVerticalAlignment(JLabel.CENTER);
@@ -99,26 +104,38 @@ public class ElevatorPanel extends JPanel {
 	 * Create door label that indicates when the elevator doors are open or closed. 
 	 */
 	private void createDoorLabel() {
-		doorsLabel = new JLabel("[|   |]");
-		doorsLabel.setFont(new Font("Aharoni", 0, 32));
-		doorsLabel.setPreferredSize(new Dimension(WIDTH, 50));
+		doorsLabel = new JLabel(DOORS_OPENS);
+		doorsLabel.setFont(new Font("Aharoni", 0, 20));
+		doorsLabel.setPreferredSize(new Dimension(WIDTH, 35));
 		doorsLabel.setForeground(Color.white);
 		doorsLabel.setVerticalAlignment(JLabel.CENTER);
 		doorsLabel.setHorizontalAlignment(JLabel.CENTER);
 	}
 	
 	/**
+	 * Creates the status label which indicates the status of the elevator.
+	 */
+	private void createStatusLabel() {
+		statusLabel = new JLabel("<html><div style='text-align: center;'>Waiting for request</div></html>");
+		statusLabel.setFont(new Font("Aharoni", 0, 14));
+		statusLabel.setPreferredSize(new Dimension(WIDTH - 10, 70));
+		statusLabel.setForeground(Color.white);
+		statusLabel.setVerticalAlignment(JLabel.CENTER);
+		statusLabel.setHorizontalAlignment(JLabel.CENTER);
+	}
+	
+	/**
 	 * Changes the Door Label to closed.
 	 */
 	public void closeDoorsLabel() {
-		doorsLabel.setText("[|]");
+		doorsLabel.setText(DOORS_CLOSED);
 	}
 	
 	/**
 	 * Changes the Door Label to open. 
 	 */
 	public void openDoorsLabel() {
-		doorsLabel.setText("[|   |]");
+		doorsLabel.setText(DOORS_OPENS);
 	}
 	
 	/**
@@ -156,19 +173,14 @@ public class ElevatorPanel extends JPanel {
 	 * Updated floor label and icon when going up. 
 	 */
 	private void handleGoingUpState() {
-		if (floorLabel.getIcon() == null) {
-			updateFloorLabel(UP_ICON, GREEN_COLOR);
-		}
+		updateFloorLabel(UP_ICON, GREEN_COLOR);
 	}
 	
 	/**
 	 * Updated floor label and icon when going down. 
 	 */
 	private void handleGoingDownState() {
-		if (floorLabel.getIcon() == null) {
-			updateFloorLabel(DOWN_ICON, RED_COLOR);
-		}
-	
+		updateFloorLabel(DOWN_ICON, RED_COLOR);
 	}
 	
 	/**
@@ -178,7 +190,6 @@ public class ElevatorPanel extends JPanel {
 		int floorNum = slider.getValue() + 1;
 		slider.setValue(floorNum);
 		floorLabel.setText(String.valueOf(floorNum));
-
 	}
 	
 	/**
@@ -204,6 +215,7 @@ public class ElevatorPanel extends JPanel {
 	 */
 	private void handleTransientFault() {
 		updateFloorLabel(TRANS_FAULT_ICON, YELLOW_COLOR);
+		updateStatus("Transient fault, repairing...");
 	}
 	
 	/**
@@ -215,6 +227,7 @@ public class ElevatorPanel extends JPanel {
 	    for (int i = Floor.BOTTOM_FLOOR; i <= Floor.NUM_FLOORS; i++) {
 	    	((JLabel) slider.getLabelTable().get(i)).setForeground(RED_COLOR);
 	    }
+	    updateStatus("ERROR: hard fault");
 	}
 	
 	/**
@@ -224,6 +237,7 @@ public class ElevatorPanel extends JPanel {
 	 */
 	public void highlightDestination(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.cyan);
+		updateStatus("Moving to destination floor");
 		slider.repaint();
 	}
 	
@@ -234,7 +248,7 @@ public class ElevatorPanel extends JPanel {
 	 * @param floorNum destination of floor request
 	 */
 	public void unHighlightDestination(int floorNum) {
-		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.white);	
+		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.white);
 		slider.repaint();
 	}
 	
@@ -245,7 +259,8 @@ public class ElevatorPanel extends JPanel {
 	 * @param floorNum floor someone is waiting for the elevator at
 	 */
 	public void addStar(int floorNum) {
-		((JLabel) slider.getLabelTable().get(floorNum)).setText(floorNum + " *");	
+		((JLabel) slider.getLabelTable().get(floorNum)).setText(floorNum + " *");
+		updateStatus("Received request at floor " + floorNum);
 		slider.repaint();
 	}
 	
@@ -258,6 +273,15 @@ public class ElevatorPanel extends JPanel {
 	public void removeStar(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setText(String.valueOf(floorNum));
 		slider.repaint();
+	}
+	
+	/**
+	 * Updates the stauts label of elevator.
+	 * 
+	 * @param text The text to update the label with.
+	 */
+	public void updateStatus(String text) {
+		statusLabel.setText("<html><div style='text-align: center;'>" + text + "</div></html>");
 	}
 	
 }

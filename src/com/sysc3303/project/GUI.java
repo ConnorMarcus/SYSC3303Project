@@ -15,7 +15,7 @@ public class GUI extends JFrame {
 	 * Constructor for the GUI object.
 	 */
 	public GUI() {
-		super();
+		super("Elevator subsystem - Group #9");
 		initializeJFrame();
 	}
 	

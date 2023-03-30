@@ -242,6 +242,8 @@ public class ElevatorState {
 				setNewState(direction.toString(), elevator);
 			}
 		}
+		// need to update GUI panel when no further requests
+		elevator.getElevatorPanel().updateStatus("Waiting for request");
 	}
 
 	/**

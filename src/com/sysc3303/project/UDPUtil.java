@@ -151,7 +151,6 @@ public class UDPUtil {
 	        return in.readObject();
 	    } 
 	    catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 	}
