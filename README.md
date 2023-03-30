@@ -69,7 +69,7 @@ The following is a brief description of the Java files contained within the proj
 
 2. Once the project is loaded in Eclipse, it can be run by running the following files in this order: Scheduler.java, Elevator.java, and Floor.java in the "src" directory under the "com.sysc3303.project" package (each file contains a main method).
 
-- It can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses in Scheduler.java and Floor.java must be set (change the ADDRESS constants). To get the IP address of the computer run the following commands:
+- The project can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses in Scheduler.java and Floor.java must be set (change the ADDRESS constants) to the corresponding computer's IP address. To get the IP address of the computer run the following commands:
 
   - **Windows:** get the Ipv4 address
     ```
@@ -80,9 +80,9 @@ The following is a brief description of the Java files contained within the proj
     curl ifconfig.me
     ```
 - The number of elevators that are running can be changed by changing the NUM_CARS constant in Elevator.java.
-- You can adjust the floor_input.txt file to simulate the different kind of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
+- You can adjust the floor_input.txt file to simulate the different kinds of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
 
-3. Once the project has been run, you should see output in the console corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
+3. Once the project has been run, you should see output in the console and a GUI will appear corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
 
 ### Run the JUnit test cases for the project:
 
@@ -92,4 +92,4 @@ The following is a brief description of the Java files contained within the proj
 
 3. Alternatively, all the JUnit Test Classes can be run by right-clicking on the "com.sysc3303.project.test" package and selecting Run As > JUnit Test.
 
-***NOTE:*** If you encounter an error when running the project or the test cases in Eclipse you may need to clean the project by selecting in the menu Project > Clean.
+***NOTE:*** If you encounter an error when running the project or the test cases in Eclipse you may need to clean the project by selecting the menu Project > Clean.
