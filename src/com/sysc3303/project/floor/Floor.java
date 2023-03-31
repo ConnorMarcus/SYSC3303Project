@@ -30,6 +30,7 @@ public class Floor implements Runnable {
 	private final Queue<String> responseQueue = new ArrayDeque<>();
 	private boolean shouldSleep = true; //flag to set whether the threads should sleep or not
 	private long startTime;
+	private int numEvents = 0; //number of events read from input file
 
 	/**
 	 * A constructor for a FloorSubsystem
@@ -186,6 +187,7 @@ public class Floor implements Runnable {
 			
 			// read remaining lines from the text file
 			while ((line = br.readLine()) != null) {
+				numEvents += 1;
 				lineValues = line.split(" ");
 				Time elevatorTime = Time.createFromTimeString((lineValues[0]));
 				int elevatorFloor = Integer.parseInt(lineValues[1]);
@@ -214,6 +216,8 @@ public class Floor implements Runnable {
 	
 	private void outputPerformanceMeasure() {
 		long performance = (System.nanoTime() - startTime) / 1000000;
-		System.out.println(Thread.currentThread().getName() + ": " + "scheduler subsystem performance measure: " + performance + "ms");
+		long averageResponseTime = performance/numEvents;
+		System.out.println(Thread.currentThread().getName() + ": " + "scheduler subsystem performance measure (time to run entire input file): " + performance + "ms");
+		System.out.println(Thread.currentThread().getName() + ": " + "average response time (average time to handle single event): " + averageResponseTime + "ms");
 	}
 }
