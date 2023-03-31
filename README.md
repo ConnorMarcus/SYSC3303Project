@@ -27,7 +27,7 @@ The following is a brief description of the Java files contained within the proj
 
 
 ### Iteration 5
-- **Connor**: Interfaced existing Elevator system with the GUI
+- **Connor**: Interfaced existing Elevator system with the GUI, fixed bugs in GUI
 - **Ilyes**: UML Class diagram, refactoring, JUnit test cases
 - **Noah**: Added performance measuring capabilities to the Scheduler, ElevatorPanel.java
 - **Patrick**: Timing diagrams for performance measurements, refactoring project structure
@@ -61,6 +61,15 @@ The following is a brief description of the Java files contained within the proj
 - **Patrick**: Floor.java, refactoring and FloorRequest.java.
 - **Vahid**: Scheduler.java, Main.java and UML Sequence diagram.
 
+## Error Handling
+
+### Transient Faults ![transient fault icon](Resources/images/transientFaultIcon.png)
+Transient faults include events such as an elevator door failing to close. These types of faults are repaired and resolved by the elevator. Transient faults are encoded within the Fault column of the `floor_input.txt` as the number 1. Transient faults are shown in the GUI using the following [icon](Resources/images/transientFaultIcon.png).
+
+### Hard Faults ![hard fault icon](Resources/images/hardFaultIcon.png)
+
+Hard faults include events such as an elevator loosing power. These types of faults cannot be repaired and cause the elevator to shutdown. Hard faults are encoded within the Fault column of the `floor_input.txt` as the number 2. Hard faults are shown in the GUI using the following [icon](Resources/images/hardFaultIcon.png) and by changing the colour of the elevator that encountered the hard fault to red. 
+
 ## Usage 
 
 ### Run the project in Eclipse:
@@ -80,7 +89,7 @@ The following is a brief description of the Java files contained within the proj
     curl ifconfig.me
     ```
 - The number of elevators that are running can be changed by changing the NUM_CARS constant in Elevator.java.
-- You can adjust the floor_input.txt file to simulate the different kinds of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
+- You can adjust the `floor_input.txt` file to simulate the different kinds of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
 
 3. Once the project has been run, you should see output in the console and a GUI will appear corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
 
@@ -93,3 +102,10 @@ The following is a brief description of the Java files contained within the proj
 3. Alternatively, all the JUnit Test Classes can be run by right-clicking on the "com.sysc3303.project.test" package and selecting Run As > JUnit Test.
 
 ***NOTE:*** If you encounter an error when running the project or the test cases in Eclipse you may need to clean the project by selecting the menu Project > Clean.
+
+
+## Sample Output
+
+![Elevator system sample output](Resources/images/sampleOutput.png)
+As shown above is the sample output of the Elevator system. The system is set with 4 elevators with 22 floors. 
+
