@@ -98,6 +98,7 @@ public class ElevatorState {
 			}
 			
 			System.out.println(Thread.currentThread().getName() + ": elevator resolved it's transient fault");
+			elevator.getElevatorPanel().handleTransientFaultFixed();
 			setNewState(ElevatorEvent.Direction.STOPPED.toString(), elevator);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -244,7 +245,7 @@ public class ElevatorState {
 			}
 		}
 		// need to update GUI panel when no further requests
-		elevator.getElevatorPanel().updateStatus("Waiting for request");
+		elevator.getElevatorPanel().handleFinishedMoving();
 	}
 
 	/**

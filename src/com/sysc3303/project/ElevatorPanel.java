@@ -219,6 +219,15 @@ public class ElevatorPanel extends JPanel {
 	}
 	
 	/**
+	 * Indicates that transient fault has been fixed  
+	 */
+	public void handleTransientFaultFixed() {
+		floorLabel.setIcon(null);
+		floorLabel.setForeground(Color.white);
+		updateStatus("Transient fault fixed.");
+	}
+	
+	/**
 	 * Indicate hard fault in elevator. 
 	 */
 	public void handleHardFault() {
@@ -231,13 +240,22 @@ public class ElevatorPanel extends JPanel {
 	}
 	
 	/**
+	 * Indicate elevator has finished servicing all
+	 * its requests and is waiting for a new request
+	 */
+	public void handleFinishedMoving() {
+		updateStatus("Waiting for request");
+	}
+	
+	
+	/**
 	 * Highlight destination of floor request on the elevator's slider. 
 	 * 
 	 * @param floorNum destination of floor request
 	 */
 	public void highlightDestination(int floorNum) {
 		((JLabel) slider.getLabelTable().get(floorNum)).setForeground(Color.cyan);
-		updateStatus("Moving to destination floor");
+		updateStatus("New destination floor " + floorNum);
 		slider.repaint();
 	}
 	
@@ -280,7 +298,7 @@ public class ElevatorPanel extends JPanel {
 	 * 
 	 * @param text The text to update the label with.
 	 */
-	public void updateStatus(String text) {
+	private void updateStatus(String text) {
 		statusLabel.setText("<html><div style='text-align: center;'>" + text + "</div></html>");
 	}
 	
