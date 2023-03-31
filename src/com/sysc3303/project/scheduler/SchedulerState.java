@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.scheduler;
 
 /**
  * Class to represent the scheduler's state; superclass with default behavior to events

@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import com.sysc3303.project.ElevatorRequest;
-import com.sysc3303.project.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorRequest;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
 
 /**
  * @author Group 9

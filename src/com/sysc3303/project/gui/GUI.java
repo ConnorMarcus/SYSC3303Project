@@ -1,8 +1,10 @@
-package com.sysc3303.project;
+package com.sysc3303.project.gui;
 
 import java.awt.FlowLayout; 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+
+import com.sysc3303.project.elevator.Elevator;
 
 /**
  * Class to create the JFrame that holds each ElevatorPanel in the GUI. 

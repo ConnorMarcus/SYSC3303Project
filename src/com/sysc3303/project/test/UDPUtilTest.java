@@ -8,12 +8,13 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.junit.jupiter.api.Test;
-import com.sysc3303.project.ElevatorEvent;
-import com.sysc3303.project.ElevatorEvent.Direction;
-import com.sysc3303.project.ElevatorEvent.Fault;
-import com.sysc3303.project.FloorRequest;
-import com.sysc3303.project.Time;
-import com.sysc3303.project.UDPUtil;
+
+import com.sysc3303.project.elevator.ElevatorEvent;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorEvent.Fault;
+import com.sysc3303.project.floor.FloorRequest;
+import com.sysc3303.project.utils.Time;
+import com.sysc3303.project.utils.UDPUtil;
 
 /**
  * @author Group 9

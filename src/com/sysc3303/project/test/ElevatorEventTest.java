@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.sysc3303.project.ElevatorEvent;
-import com.sysc3303.project.ElevatorEvent.Fault;
-import com.sysc3303.project.Time;
+import com.sysc3303.project.elevator.ElevatorEvent;
+import com.sysc3303.project.elevator.ElevatorEvent.Fault;
+import com.sysc3303.project.utils.Time;
 
 /**
  * @author Group 9
