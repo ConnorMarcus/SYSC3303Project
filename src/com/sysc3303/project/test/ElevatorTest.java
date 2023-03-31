@@ -6,8 +6,11 @@ package com.sysc3303.project.test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.sysc3303.project.*;
-import com.sysc3303.project.ElevatorEvent.Direction;
-import com.sysc3303.project.ElevatorEvent.Fault;
+import com.sysc3303.project.elevator.Elevator;
+import com.sysc3303.project.elevator.ElevatorEvent;
+import com.sysc3303.project.elevator.ElevatorState;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorEvent.Fault;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

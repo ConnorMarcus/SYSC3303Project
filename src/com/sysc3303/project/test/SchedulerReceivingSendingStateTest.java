@@ -1,8 +1,9 @@
 package com.sysc3303.project.test;
 
-import com.sysc3303.project.Scheduler;
-import com.sysc3303.project.SchedulerReceivingSendingState;
-import com.sysc3303.project.SchedulerReceivingState;
+import com.sysc3303.project.scheduler.Scheduler;
+import com.sysc3303.project.scheduler.SchedulerReceivingSendingState;
+import com.sysc3303.project.scheduler.SchedulerReceivingState;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

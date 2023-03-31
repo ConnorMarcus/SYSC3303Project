@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.AfterAll;
 
 import com.sysc3303.project.*;
+import com.sysc3303.project.scheduler.Scheduler;
+import com.sysc3303.project.scheduler.SchedulerReceivingState;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,10 @@
 
-package com.sysc3303.project;
+package com.sysc3303.project.elevator;
 
 import java.io.Serializable;
+
+import com.sysc3303.project.floor.Floor;
+import com.sysc3303.project.utils.Time;
 
 /**
  * ElevatorEvents are objects representing the lines of input read in from the

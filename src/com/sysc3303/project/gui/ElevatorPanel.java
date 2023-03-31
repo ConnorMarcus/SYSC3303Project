@@ -1,4 +1,4 @@
-package com.sysc3303.project;
+package com.sysc3303.project.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,7 +10,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
-import com.sysc3303.project.ElevatorEvent.Direction;
+
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorState;
+import com.sysc3303.project.floor.Floor;
 
 /**
  * ElevatorPanel that shows all the associated components for each Elevator  
