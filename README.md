@@ -1,15 +1,17 @@
-# Group 9 - Iteration 4
+# Group 9 - Iteration 5
 Group Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
 
 ## Project Structure 
 The following is a brief description of the Java files contained within the project:
 - `Elevator.java` represents the Elevator subsystem which communicates with the Scheduler to process elevator events.
 - `ElevatorEvent.java` represents each text line from the input file as an object.
+- `ElevatorPanel.java` represents the JPanel used to model the graphical components of an Elevator.
 - `ElevatorState.java` represents the state of the elevator subsystem.
 - `ElevatorRequest.java` represents a request from the Elevator to the Scheduler indicating it's ready to receive a FloorRequest. 
 - `EleavtorResponse.java` represents a response object the elevator sends out to the scheduler after an event has occurred.
 - `Floor.java` represents the floor subsystem which handles the parsing of the input file and communicating that with the Scheduler.
 - `FloorRequest.java` represents a request made from the floor subsystem to the Scheduler.
+- `GUI.java` represents the JFrame containing the complete GUI for the Elevator system.
 - `Scheduler.java` represents the Scheduler subsystem which communicates with both the floor and elevator subsystems.
 - `SchedulerState.java` represents the state of the Scheduler subsystem.
 - `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
@@ -22,6 +24,14 @@ The following is a brief description of the Java files contained within the proj
 - `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
 
 ## Responsibilty Breakdown
+
+
+### Iteration 5
+- **Connor**: Interfaced existing Elevator system with the GUI
+- **Ilyes**: UML Class diagram, refactoring, JUnit test cases
+- **Noah**: Added performance measuring capabilities to the Scheduler, ElevatorPanel.java
+- **Patrick**: Timing diagrams for performance measurements, refactoring project structure
+- **Vahid**: README, ElevatorPanel.java, GUI.java
 
 ### Iteration 4
 - **Connor**: Added fault handling code to Scheduler, Elevator, ElevatorState, and updated elevator state machine diagram
@@ -55,11 +65,11 @@ The following is a brief description of the Java files contained within the proj
 
 ### Run the project in Eclipse:
 
-1. Load the project into Eclipse using the provided zip inside the submission zip: "LA3G9_milestone_3.zip". To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
+1. Load the project into Eclipse using the provided zip inside the final submission zip. To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
 
 2. Once the project is loaded in Eclipse, it can be run by running the following files in this order: Scheduler.java, Elevator.java, and Floor.java in the "src" directory under the "com.sysc3303.project" package (each file contains a main method).
 
-- It can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses in Scheduler.java and Floor.java must be set (change the ADDRESS constants). To get the IP address of the computer run the following commands:
+- The project can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses in Scheduler.java and Floor.java must be set (change the ADDRESS constants) to the corresponding computer's IP address. To get the IP address of the computer run the following commands:
 
   - **Windows:** get the Ipv4 address
     ```
@@ -70,9 +80,9 @@ The following is a brief description of the Java files contained within the proj
     curl ifconfig.me
     ```
 - The number of elevators that are running can be changed by changing the NUM_CARS constant in Elevator.java.
-- You can adjust the floor_input.txt file to simulate the different kind of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
+- You can adjust the floor_input.txt file to simulate the different kinds of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
 
-3. Once the project has been run, you should see output in the console corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
+3. Once the project has been run, you should see output in the console and a GUI will appear corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
 
 ### Run the JUnit test cases for the project:
 
@@ -82,4 +92,4 @@ The following is a brief description of the Java files contained within the proj
 
 3. Alternatively, all the JUnit Test Classes can be run by right-clicking on the "com.sysc3303.project.test" package and selecting Run As > JUnit Test.
 
-***NOTE:*** If you encounter an error when running the project or the test cases in Eclipse you may need to clean the project by selecting in the menu Project > Clean.
+***NOTE:*** If you encounter an error when running the project or the test cases in Eclipse you may need to clean the project by selecting the menu Project > Clean.
