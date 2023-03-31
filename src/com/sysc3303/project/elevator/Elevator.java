@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.elevator;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,8 +9,13 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.sysc3303.project.ElevatorEvent.Direction;
-import com.sysc3303.project.ElevatorEvent.Fault;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
+import com.sysc3303.project.floor.Floor;
+import com.sysc3303.project.floor.FloorRequest;
+import com.sysc3303.project.gui.ElevatorPanel;
+import com.sysc3303.project.gui.GUI;
+import com.sysc3303.project.scheduler.Scheduler;
+import com.sysc3303.project.utils.UDPUtil;
 
 /**
  * Corresponds to elevators in the Elevator subsystem.

@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.sysc3303.project.ElevatorResponse;
-import com.sysc3303.project.Floor;
-import com.sysc3303.project.Scheduler;
+import com.sysc3303.project.elevator.ElevatorResponse;
+import com.sysc3303.project.floor.Floor;
+import com.sysc3303.project.scheduler.Scheduler;
 
 /**
  * @author Group 9

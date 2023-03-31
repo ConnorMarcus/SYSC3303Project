@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.scheduler;
 
 /**
  * @author Group 9

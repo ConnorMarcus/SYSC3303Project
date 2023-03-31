@@ -1,9 +1,11 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.floor;
 
 import java.io.Serializable;
+
+import com.sysc3303.project.elevator.ElevatorEvent;
 
 /**
  * Represents a request sent from the Floor to the Scheduler

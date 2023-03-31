@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.scheduler;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -14,7 +14,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import com.sysc3303.project.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorRequest;
+import com.sysc3303.project.elevator.ElevatorResponse;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
+import com.sysc3303.project.floor.Floor;
+import com.sysc3303.project.floor.FloorRequest;
+import com.sysc3303.project.utils.UDPUtil;
 
 /**
  * The Scheduler class which schedules the elevators and enables communication

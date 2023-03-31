@@ -1,8 +1,8 @@
-package com.sysc3303.project;
+package com.sysc3303.project.elevator;
 
 import java.io.Serializable;
 
-import com.sysc3303.project.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
 
 /**
  * Class to represent a request made by an Elevator.

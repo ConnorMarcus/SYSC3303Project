@@ -1,8 +1,16 @@
 package com.sysc3303.project.test;
 
 import com.sysc3303.project.*;
-import com.sysc3303.project.ElevatorEvent.Direction;
-import com.sysc3303.project.ElevatorEvent.Fault;
+import com.sysc3303.project.elevator.Elevator;
+import com.sysc3303.project.elevator.ElevatorEvent;
+import com.sysc3303.project.elevator.ElevatorState;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorEvent.Fault;
+import com.sysc3303.project.floor.Floor;
+import com.sysc3303.project.floor.FloorRequest;
+import com.sysc3303.project.scheduler.Scheduler;
+import com.sysc3303.project.utils.Time;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

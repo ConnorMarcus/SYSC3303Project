@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.elevator;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,8 +10,10 @@ import java.util.Set;
 
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
 
-import com.sysc3303.project.ElevatorEvent.Direction;
-import com.sysc3303.project.ElevatorEvent.Fault;
+import com.sysc3303.project.elevator.ElevatorEvent.Direction;
+import com.sysc3303.project.elevator.ElevatorEvent.Fault;
+import com.sysc3303.project.floor.FloorRequest;
+import com.sysc3303.project.utils.UDPUtil;
 
 /**
  * Class to represent the elevator's state

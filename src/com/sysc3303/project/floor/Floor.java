@@ -1,4 +1,4 @@
-package com.sysc3303.project;
+package com.sysc3303.project.floor;
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -7,7 +7,11 @@ import java.net.InetAddress;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-import com.sysc3303.project.ElevatorEvent.Fault;
+import com.sysc3303.project.elevator.ElevatorEvent;
+import com.sysc3303.project.elevator.ElevatorEvent.Fault;
+import com.sysc3303.project.scheduler.Scheduler;
+import com.sysc3303.project.utils.Time;
+import com.sysc3303.project.utils.UDPUtil;
 
 /**
  * The Floor subsystem

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.sysc3303.project;
+package com.sysc3303.project.scheduler;
 
 /**
  * Class representing the state of the scheduler when it is only receiving requests (i.e. no queued responses)

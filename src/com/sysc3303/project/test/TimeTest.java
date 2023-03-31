@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.sysc3303.project.Time;
+import com.sysc3303.project.utils.Time;
 
 /**
  * @author Group 9
