@@ -1,33 +1,43 @@
-# Group 9 - Iteration 5
-Group Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
+# Elevator Control System and Simulator 
+Group 9 - Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
 
 ## Project Structure 
-The following is a brief description of the Java files contained within the project:
+The project code is broken down into several packages for the different subsystems and components: 
+
+### Elevator package
 - `Elevator.java` represents the Elevator subsystem which communicates with the Scheduler to process elevator events.
 - `ElevatorEvent.java` represents each text line from the input file as an object.
-- `ElevatorPanel.java` represents the JPanel used to model the graphical components of an Elevator.
-- `ElevatorState.java` represents the state of the elevator subsystem.
 - `ElevatorRequest.java` represents a request from the Elevator to the Scheduler indicating it's ready to receive a FloorRequest. 
 - `EleavtorResponse.java` represents a response object the elevator sends out to the scheduler after an event has occurred.
+- `ElevatorState.java` represents the state of the elevator subsystem.
+
+### Floor package
 - `Floor.java` represents the floor subsystem which handles the parsing of the input file and communicating that with the Scheduler.
 - `FloorRequest.java` represents a request made from the floor subsystem to the Scheduler.
+
+### GUI package
+- `ElevatorPanel.java` represents the JPanel used to model the graphical components of an Elevator.
 - `GUI.java` represents the JFrame containing the complete GUI for the Elevator system.
+
+### Scheduler package
 - `Scheduler.java` represents the Scheduler subsystem which communicates with both the floor and elevator subsystems.
-- `SchedulerState.java` represents the state of the Scheduler subsystem.
 - `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
 - `SchedulerReceivingSendingState.java` represents the concrete state of the scheduler when it can receive and respond to requests
+- `SchedulerState.java` represents the state of the Scheduler subsystem.
+
+### Utils package
 - `Time.java` represents the time stamp from the input file request in the following format: hh:mm:ss.mmm
 - `UDPUtil.java` is a utility class for UPD-related functions such as: creating sockets, packets, sending and receiving packets, etc.
 
-*Above classes have associated JUnit test files*
 
-- `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
+### Test package
+
+- Contains all test classes associated with the project.
 
 ## Responsibilty Breakdown
 
-
 ### Iteration 5
-- **Connor**: Interfaced existing Elevator system with the GUI
+- **Connor**: Interfaced existing Elevator system with the GUI, fixed bugs in GUI
 - **Ilyes**: UML Class diagram, refactoring, JUnit test cases
 - **Noah**: Added performance measuring capabilities to the Scheduler, ElevatorPanel.java
 - **Patrick**: Timing diagrams for performance measurements, refactoring project structure
@@ -61,6 +71,15 @@ The following is a brief description of the Java files contained within the proj
 - **Patrick**: Floor.java, refactoring and FloorRequest.java.
 - **Vahid**: Scheduler.java, Main.java and UML Sequence diagram.
 
+## Error Handling
+
+### Transient Faults ![transient fault icon](Resources/images/transientFaultIcon.png)
+Transient faults include events such as an elevator door failing to close. These types of faults are repaired and resolved by the elevator. Transient faults are encoded within the Fault column of the `floor_input.txt` as the number 1. Transient faults are shown in the GUI using the following [icon](Resources/images/transientFaultIcon.png).
+
+### Hard Faults ![hard fault icon](Resources/images/hardFaultIcon.png)
+
+Hard faults include events such as an elevator loosing power. These types of faults cannot be repaired and cause the elevator to shutdown. Hard faults are encoded within the Fault column of the `floor_input.txt` as the number 2. Hard faults are shown in the GUI using the following [icon](Resources/images/hardFaultIcon.png) and by changing the colour of the elevator that encountered the hard fault to red. 
+
 ## Usage 
 
 ### Run the project in Eclipse:
@@ -80,7 +99,7 @@ The following is a brief description of the Java files contained within the proj
     curl ifconfig.me
     ```
 - The number of elevators that are running can be changed by changing the NUM_CARS constant in Elevator.java.
-- You can adjust the floor_input.txt file to simulate the different kinds of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
+- You can adjust the `floor_input.txt` file to simulate the different kinds of faults. 0 corresponds to no fault, 1 corresponds to a transient fault, 2 corresponds to a hard fault, and -1 corresponds to a shutdown event (this should only be used internally to indicate to the Elevator subsystem that the simulation is finished).
 
 3. Once the project has been run, you should see output in the console and a GUI will appear corresponding to the events sent and received by the Elevator, Scheduler, and Floor subsystems.
 
@@ -93,3 +112,18 @@ The following is a brief description of the Java files contained within the proj
 3. Alternatively, all the JUnit Test Classes can be run by right-clicking on the "com.sysc3303.project.test" package and selecting Run As > JUnit Test.
 
 ***NOTE:*** If you encounter an error when running the project or the test cases in Eclipse you may need to clean the project by selecting the menu Project > Clean.
+
+
+## Sample Output
+
+As shown below is the sample output of the Elevator system. The system is set with 4 elevators with 22 floors. An explanation of the elevator system is given from **left to right**: 
+- Elevator is idle and waiting for a request
+- Elevator has encountred a hard fault and is out of operation
+- Elevator is processing a request and moving up towards the destination floor (highlighted in cyan)
+- Elevator has encounted a transient fault and is reparing itself, after which it will continue processing requests
+
+![Elevator system sample output](Resources/images/systemSampleOutput.png)
+
+## Modifying Elevator System Output
+
+`floor_input.txt` located within the [Resources folder](Resources/) contains the input requests read by the Floor subsystem (time, floor, floor button, car button, and fault). You should change [this file](Resources/floor_input.txt) if you wish to change the requests.
