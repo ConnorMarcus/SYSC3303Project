@@ -86,7 +86,10 @@ Hard faults include events such as an elevator loosing power. These types of fau
 
 1. Load the project into Eclipse using the provided zip inside the final submission zip. To do this click the "File" menu in Eclipse then click “Import”, and under the "General" folder select "Project from Folder or Archive". Now select the previously mentioned zip file from your file system and click “Finish”.
 
-2. Once the project is loaded in Eclipse, it can be run by running the following files in this order: Scheduler.java, Elevator.java, and Floor.java in the "src" directory under the "com.sysc3303.project" package (each file contains a main method).
+2. Once the project is loaded into Eclipse, it can be run by executing the main methods of the following files under the `src` directory and `com.sysc3303.project` package in the **following order**: 
+    1. `Scheduler.java` (located in the `com.sysc3303.project.scheduler` package)
+    2. `Elevator.java` (located in the `com.sysc3303.project.elevator` package)
+    3. `Floor.java` (located in the `com.sysc3303.project.floor` package) 
 
 - The project can be run in that order on either 1 or 3 computers. If running on 3 different computers the IP addresses in Scheduler.java and Floor.java must be set (change the ADDRESS constants) to the corresponding computer's IP address. To get the IP address of the computer run the following commands:
 
@@ -107,9 +110,9 @@ Hard faults include events such as an elevator loosing power. These types of fau
 
 1. Follow the previous steps to set up the project in Eclipse.
 
-2. To run a single test case open the "com.sysc3303.project.test" package in the “src” directory then click on any JUnit Test Class. Now in the Drop down menu select Run > Run As > JUnit Test.
+2. To run a single test case open the `com.sysc3303.project.test` package in the `src` directory then click on any JUnit Test Class. Now in the Drop down menu select Run > Run As > JUnit Test.
 
-3. Alternatively, all the JUnit Test Classes can be run by right-clicking on the "com.sysc3303.project.test" package and selecting Run As > JUnit Test.
+3. Alternatively, all the JUnit Test Classes can be run by right-clicking on the `com.sysc3303.project.test` package and selecting Run As > JUnit Test.
 
 ***NOTE:*** If you encounter an error when running the project or the test cases in Eclipse you may need to clean the project by selecting the menu Project > Clean.
 
