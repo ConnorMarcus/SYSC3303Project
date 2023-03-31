@@ -1,30 +1,40 @@
-# Group 9 - Iteration 5
-Group Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
+# Elevator Control System and Simulator 
+Group 9 - Members: Vahid Foroughi, Noah Hammoud, Ilyes Hasnaou, Connor Marcus, Patrick Vafaie 
 
 ## Project Structure 
-The following is a brief description of the Java files contained within the project:
+The project code is broken down into several packages for the different subsystems and components: 
+
+### Elevator package
 - `Elevator.java` represents the Elevator subsystem which communicates with the Scheduler to process elevator events.
 - `ElevatorEvent.java` represents each text line from the input file as an object.
-- `ElevatorPanel.java` represents the JPanel used to model the graphical components of an Elevator.
-- `ElevatorState.java` represents the state of the elevator subsystem.
 - `ElevatorRequest.java` represents a request from the Elevator to the Scheduler indicating it's ready to receive a FloorRequest. 
 - `EleavtorResponse.java` represents a response object the elevator sends out to the scheduler after an event has occurred.
+- `ElevatorState.java` represents the state of the elevator subsystem.
+
+### Floor package
 - `Floor.java` represents the floor subsystem which handles the parsing of the input file and communicating that with the Scheduler.
 - `FloorRequest.java` represents a request made from the floor subsystem to the Scheduler.
+
+### GUI package
+- `ElevatorPanel.java` represents the JPanel used to model the graphical components of an Elevator.
 - `GUI.java` represents the JFrame containing the complete GUI for the Elevator system.
+
+### Scheduler package
 - `Scheduler.java` represents the Scheduler subsystem which communicates with both the floor and elevator subsystems.
-- `SchedulerState.java` represents the state of the Scheduler subsystem.
 - `SchedulerReceivingState.java` represents the concrete state of the scheduler when it is only receiving requests.
 - `SchedulerReceivingSendingState.java` represents the concrete state of the scheduler when it can receive and respond to requests
+- `SchedulerState.java` represents the state of the Scheduler subsystem.
+
+### Utils package
 - `Time.java` represents the time stamp from the input file request in the following format: hh:mm:ss.mmm
 - `UDPUtil.java` is a utility class for UPD-related functions such as: creating sockets, packets, sending and receiving packets, etc.
 
-*Above classes have associated JUnit test files*
 
-- `floor_input.txt` located within the Resources folder and it contains the input requests read by the Floor subsystem (time, floor, floor button, and car button). You should change this file if you wish to change the requests.
+### Test package
+
+- Contains all test classes associated with the project.
 
 ## Responsibilty Breakdown
-
 
 ### Iteration 5
 - **Connor**: Interfaced existing Elevator system with the GUI, fixed bugs in GUI
@@ -106,6 +116,14 @@ Hard faults include events such as an elevator loosing power. These types of fau
 
 ## Sample Output
 
-![Elevator system sample output](Resources/images/sampleOutput.png)
-As shown above is the sample output of the Elevator system. The system is set with 4 elevators with 22 floors. 
+As shown below is the sample output of the Elevator system. The system is set with 4 elevators with 22 floors. An explanation of the elevator system is given from **left to right**: 
+- Elevator is idle and waiting for a request
+- Elevator has encountred a hard fault and is out of operation
+- Elevator is processing a request and moving up towards the destination floor (highlighted in cyan)
+- Elevator has encounted a transient fault and is reparing itself, after which it will continue processing requests
 
+![Elevator system sample output](Resources/images/systemSampleOutput.png)
+
+## Modifying Elevator System Output
+
+`floor_input.txt` located within the [Resources folder](Resources/) contains the input requests read by the Floor subsystem (time, floor, floor button, car button, and fault). You should change [this file](Resources/floor_input.txt) if you wish to change the requests.
