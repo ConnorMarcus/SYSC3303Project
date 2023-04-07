@@ -31,7 +31,7 @@ public class SchedulerReceivingSendingStateTest {
     }
 
     @Test
-    public void testHandleResponseReceived() {
+    public void testHandleResponseProcessed() {
         scheduler.setState(new SchedulerReceivingSendingState());
         // The scheduler shouldn't have anything in the queue so this will change the state
         receivingSendingState.handleResponseProcessed(scheduler);
